@@ -18,6 +18,12 @@ class AppStyle {
   ];
   static Color memberColor = Colors.blue.shade100;
   static Color adminColor = Colors.orange.shade100;
+
+  static Color endedEventColor = const Color.fromARGB(255, 247, 121, 121);
+  static Color ongoingEventColor = const Color.fromARGB(255, 132, 244, 136);
+
+  static Color eventDetailColor = Colors.yellow.shade100;
+
   static TextStyle displayName = GoogleFonts.roboto(
     fontSize: 22,
     fontWeight: FontWeight.bold,

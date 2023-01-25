@@ -2,17 +2,17 @@ import 'package:animations/animations.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:mely_admin/styles/app_styles.dart';
-import 'package:mely_admin/widgets/user_card.dart';
-import 'package:mely_admin/widgets/user_view.dart';
+import 'package:mely_admin/widgets/events/event_card.dart';
+import 'package:mely_admin/widgets/events/event_detail.dart';
 
-class UserPage extends StatefulWidget {
-  const UserPage({super.key});
+class EventPage extends StatefulWidget {
+  const EventPage({super.key});
 
   @override
-  State<UserPage> createState() => _UserPageState();
+  State<EventPage> createState() => _EventPageState();
 }
 
-class _UserPageState extends State<UserPage> {
+class _EventPageState extends State<EventPage> {
   // @override
   // void initState() {
   //   super.initState();
@@ -20,31 +20,17 @@ class _UserPageState extends State<UserPage> {
   // }
 
   // Future<void> _createUser() async {
-  //   await FirebaseFirestore.instance.collection('Users').add(
+  //   await FirebaseFirestore.instance.collection('Events').add(
   //     {
-  //       'displayName': 'Truong Thanh Huy',
-  //       'profilePicture':
+  //       'eventName': 'Ong Dev Show',
+  //       'eventPicture':
   //           'https://firebasestorage.googleapis.com/v0/b/flutter-to-do-application.appspot.com/o/defaultAvatar.jpg?alt=media&token=e1f98d07-d5e9-481c-8873-8aac1b7ee4f0',
-  //       'team': 'Technical',
-  //       'role': 'Co-Founder',
-  //       'email': 'huy@gmail.com',
-  //       'joinedAt': '01/05/2022',
-  //       'about': 'I am a developer',
+  //       'startTime': '01/02/2022',
+  //       'endTime': '03/02/2022',
+  //       'creator': 'Truong Thanh Huy',
+  //       'about': 'held at Discord',
   //     },
   //   );
-  // }
-
-  // Future<UserInformation> _searchUser(String displayName) async {
-  //   final QuerySnapshot result = await FirebaseFirestore.instance
-  //       .collection('Users')
-  //       .where('displayName', isEqualTo: displayName)
-  //       .get();
-  //   final List<QueryDocumentSnapshot> documents = result.docs;
-  //   if (documents.isNotEmpty) {
-  //     return UserInformation.fromMap(documents.first.data());
-  //   } else {
-  //     return UserInformation();
-  //   }
   // }
 
   @override
@@ -53,20 +39,13 @@ class _UserPageState extends State<UserPage> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         title: Text(
-          'Core Team',
+          'Events',
           style: AppStyle.title.copyWith(fontSize: 25),
         ),
         centerTitle: true,
         backgroundColor: Colors.white,
         elevation: 0,
         actions: [
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(
-              Icons.filter_list,
-              color: Colors.black,
-            ),
-          ),
           IconButton(
             onPressed: () {},
             icon: const Icon(
@@ -83,7 +62,7 @@ class _UserPageState extends State<UserPage> {
           Expanded(
             child: StreamBuilder<QuerySnapshot>(
               stream:
-                  FirebaseFirestore.instance.collection('Users').snapshots(),
+                  FirebaseFirestore.instance.collection('Events').snapshots(),
               builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
@@ -97,8 +76,8 @@ class _UserPageState extends State<UserPage> {
                               transitionType:
                                   ContainerTransitionType.fadeThrough,
                               closedBuilder: (context, action) =>
-                                  userCard(docs, context),
-                              openBuilder: (context, action) => UserView(
+                                  eventCard(docs, context),
+                              openBuilder: (context, action) => EventDetail(
                                 docs: docs,
                               ),
                             ))

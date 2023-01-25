@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mely_admin/models/rive_assets.dart';
-import 'package:mely_admin/pages/events_page.dart';
+import 'package:mely_admin/pages/events/events_page.dart';
 import 'package:mely_admin/pages/home_page.dart';
 import 'package:mely_admin/pages/search_page.dart';
 import 'package:mely_admin/pages/setting_page.dart';
-import 'package:mely_admin/pages/users_page.dart';
+import 'package:mely_admin/pages/users/users_page.dart';
 import 'package:mely_admin/utils/rive_utils.dart';
 import 'package:rive/rive.dart';
 

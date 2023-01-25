@@ -9,6 +9,7 @@ class UserInformation {
   String? _team;
   String? _role;
   String? _joinedAt;
+  String? _dateOfBirth;
 
   UserInformation({
     String? profilePicture,
@@ -19,7 +20,11 @@ class UserInformation {
     String? team,
     String? role,
     String? joinedAt,
+    String? dateOfBirth,
   }) {
+    if (dateOfBirth != null) {
+      _dateOfBirth = dateOfBirth;
+    }
     if (profilePicture != null) {
       _profilePicture = profilePicture;
     }
@@ -46,6 +51,7 @@ class UserInformation {
     }
   }
 
+  String? get dateOfBirth => _dateOfBirth;
   String? get profilePicture => _profilePicture;
   String? get userId => _userId;
   String? get email => _email;
@@ -64,6 +70,7 @@ class UserInformation {
   set team(String? team) => _team = team;
   set role(String? role) => _role = role;
   set joinedAt(String? joinedAt) => _joinedAt = joinedAt;
+  set dateOfBirth(String? dateOfBirth) => _dateOfBirth = dateOfBirth;
 
   UserInformation.fromJson(Map<String, dynamic> json) {
     _profilePicture = json['profilePicture'];
@@ -74,6 +81,7 @@ class UserInformation {
     _team = json['team'];
     _role = json['role'];
     _joinedAt = json['joinedAt'];
+    _dateOfBirth = json['dateOfBirth'];
   }
 
   Map<String, dynamic> toJson() {
@@ -86,6 +94,7 @@ class UserInformation {
     data['team'] = _team;
     data['role'] = _role;
     data['joinedAt'] = _joinedAt;
+    data['dateOfBirth'] = _dateOfBirth;
     return data;
   }
 }
