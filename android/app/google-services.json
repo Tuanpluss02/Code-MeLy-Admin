@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "1009459566541",
+    "firebase_url": "https://code-mely-landing-page-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "code-mely-landing-page",
+    "storage_bucket": "code-mely-landing-page.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1009459566541:android:f9c12f763f846065441684",
+        "android_client_info": {
+          "package_name": "com.codemely.mely_admin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1009459566541-lrf6ephh8rt3snqoevpdqqevm5tu7kdv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDhVY3mpS6DNCUIXs7HpYKEPMB-LxCcRO8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1009459566541-lrf6ephh8rt3snqoevpdqqevm5tu7kdv.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
