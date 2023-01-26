@@ -50,7 +50,7 @@ class _UserViewState extends State<UserView> {
                       SizedBox(width: size.width * 0.05),
                       Container(
                         // margin: EdgeInsets.only(top: size.height * 0.18),
-                        padding: EdgeInsets.only(top: size.height * 0.24),
+                        padding: EdgeInsets.only(top: size.height * 0.25),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [

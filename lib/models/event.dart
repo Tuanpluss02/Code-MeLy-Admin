@@ -1,6 +1,6 @@
 // ignore_for_file: unnecessary_getters_setters
 
-class UserInformation {
+class Event {
   String? _eventPicture;
   String? _eventId;
   String? _eventTitle;
@@ -10,7 +10,7 @@ class UserInformation {
   String? _creator;
   String? _description;
 
-  UserInformation({
+  Event({
     String? eventPicture,
     String? eventId,
     String? eventTitle,
@@ -62,7 +62,7 @@ class UserInformation {
   set description(String? description) => _description = description;
   set isEnded(bool isEnded) => _isEnded = isEnded;
 
-  UserInformation.fromJson(Map<String, dynamic> json) {
+  Event.fromJson(Map<String, dynamic> json) {
     _eventPicture = json['eventPicture'];
     _eventId = json['eventId'];
     _eventTitle = json['eventTitle'];
