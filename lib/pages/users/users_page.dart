@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:mely_admin/pages/users/add_user.dart';
 import 'package:mely_admin/styles/app_styles.dart';
 import 'package:mely_admin/widgets/users/user_card.dart';
-import 'package:mely_admin/widgets/users/user_view.dart';
+import 'package:mely_admin/widgets/users/user_detail.dart';
 
 class UserPage extends StatefulWidget {
   const UserPage({super.key});

@@ -142,7 +142,8 @@ class _AddUserState extends State<AddUser> {
                               child: SizedBox.fromSize(
                                 size: const Size.fromRadius(80), // Image radius
                                 child: imageController.image != null
-                                    ? Image.file(imageController.image!)
+                                    ? Image.file(imageController.image!,
+                                        fit: BoxFit.cover)
                                     : Image.asset(
                                         'assets/images/defaultAvatar.jpg',
                                         fit: BoxFit.cover),

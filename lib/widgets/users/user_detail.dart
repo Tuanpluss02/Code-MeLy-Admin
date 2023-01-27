@@ -17,11 +17,12 @@ class _UserViewState extends State<UserView> {
     Size size = MediaQuery.of(context).size;
     return SafeArea(
       child: Scaffold(
-        backgroundColor: (widget.docs['role'] == 'Founder' ||
-                widget.docs['role'] == 'Co-Founder' ||
-                widget.docs['role'] == 'Leader')
-            ? AppStyle.adminColor
-            : AppStyle.memberColor,
+        // backgroundColor: (widget.docs['role'] == 'Founder' ||
+        //         widget.docs['role'] == 'Co-Founder' ||
+        //         widget.docs['role'] == 'Leader')
+        //     ? AppStyle.adminColor
+        //     : AppStyle.memberColor,
+        backgroundColor: Colors.yellow.shade100,
         body: SingleChildScrollView(
           child: Stack(children: [
             ClipRRect(
@@ -41,10 +42,16 @@ class _UserViewState extends State<UserView> {
                     children: [
                       Container(
                         margin: EdgeInsets.only(top: size.height * 0.17),
-                        child: CircleAvatar(
-                          radius: 50,
-                          backgroundImage:
-                              NetworkImage(widget.docs['profilePicture']),
+                        padding: const EdgeInsets.all(3), // Border width
+                        decoration: const BoxDecoration(
+                            color: Color.fromARGB(255, 255, 255, 255),
+                            shape: BoxShape.circle),
+                        child: ClipOval(
+                          child: SizedBox.fromSize(
+                            size: const Size.fromRadius(48), // Image radius
+                            child: Image.network(widget.docs['profilePicture'],
+                                fit: BoxFit.cover),
+                          ),
                         ),
                       ),
                       SizedBox(width: size.width * 0.05),
