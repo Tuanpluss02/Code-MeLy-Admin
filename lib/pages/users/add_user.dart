@@ -301,6 +301,8 @@ class _AddUserState extends State<AddUser> {
                   ),
                   const SizedBox(height: 10),
                   TextFormField(
+                    maxLines: 5,
+                    minLines: 3,
                     decoration: InputDecoration(
                       enabledBorder: OutlineInputBorder(
                         borderSide:
@@ -329,7 +331,7 @@ class _AddUserState extends State<AddUser> {
                         horizontal: 10, vertical: 10),
                     height: 40,
                     child: ChipsFilter(
-                      selected: 1, // Select the second filter as default
+                      selected: 0, // Select the second filter as default
                       filters: const [
                         Filter(label: "Technical", icon: Icons.military_tech),
                         Filter(label: "Communication", icon: Icons.people),
@@ -351,7 +353,7 @@ class _AddUserState extends State<AddUser> {
                         horizontal: 10, vertical: 10),
                     height: 40,
                     child: ChipsFilter(
-                      selected: 1, // Select the second filter as default
+                      selected: 0, // Select the second filter as default
                       filters: const [
                         Filter(
                             label: "Founder",

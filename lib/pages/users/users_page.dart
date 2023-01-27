@@ -14,40 +14,6 @@ class UserPage extends StatefulWidget {
 }
 
 class _UserPageState extends State<UserPage> {
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   _createUser();
-  // }
-
-  // Future<void> _createUser() async {
-  //   await FirebaseFirestore.instance.collection('Users').add(
-  //     {
-  //       'displayName': 'Truong Thanh Huy',
-  //       'profilePicture':
-  //           'https://firebasestorage.googleapis.com/v0/b/flutter-to-do-application.appspot.com/o/defaultAvatar.jpg?alt=media&token=e1f98d07-d5e9-481c-8873-8aac1b7ee4f0',
-  //       'team': 'Technical',
-  //       'role': 'Co-Founder',
-  //       'email': 'huy@gmail.com',
-  //       'joinedAt': '01/05/2022',
-  //       'about': 'I am a developer',
-  //     },
-  //   );
-  // }
-
-  // Future<UserInformation> _searchUser(String displayName) async {
-  //   final QuerySnapshot result = await FirebaseFirestore.instance
-  //       .collection('Users')
-  //       .where('displayName', isEqualTo: displayName)
-  //       .get();
-  //   final List<QueryDocumentSnapshot> documents = result.docs;
-  //   if (documents.isNotEmpty) {
-  //     return UserInformation.fromMap(documents.first.data());
-  //   } else {
-  //     return UserInformation();
-  //   }
-  // }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
