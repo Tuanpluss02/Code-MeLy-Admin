@@ -1,12 +1,16 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:mely_admin/controllers/image_picker.dart';
+import 'package:mely_admin/controllers/loading_control.dart';
 import 'package:mely_admin/models/user.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -113,7 +117,7 @@ class AuthClass {
     final picker = ImagePicker();
     try {
       final image =
-          await picker.pickImage(source: ImageSource.camera, imageQuality: 50);
+          await picker.pickImage(source: ImageSource.gallery, imageQuality: 50);
       Reference ref = FirebaseStorage.instance.ref().child('user_image');
       ref.child('${user.userId}.jpg').delete();
       ref = ref.child('${user.userId}.jpg');
@@ -122,8 +126,6 @@ class AuthClass {
       user.profilePicture = await snapshot.ref.getDownloadURL();
       await FirebaseFirestore.instance
           .collection('Users')
-          .doc(user.userId)
-          .collection('UserInformation')
           .doc(user.userId)
           .set({
         'profilePicture': user.profilePicture,
@@ -134,6 +136,78 @@ class AuthClass {
       showSnackBar(context, e.toString());
     }
     return user;
+  }
+
+  Future<String> getImageFileFromAssets(String path) async {
+    final byteData = await rootBundle.load('assets/$path');
+    Uint8List fileByte = byteData.buffer
+        .asUint8List(byteData.offsetInBytes, byteData.lengthInBytes);
+    String basestring = base64.encode(fileByte);
+    return basestring;
+  }
+
+  Future<void> registerUser(
+      UserInformation user,
+      String password,
+      ImageController imageController,
+      LoadingControl loadingControl,
+      BuildContext context,
+      VoidCallback showBar) async {
+    late UserCredential userCredential;
+    loadingControl.loading = true;
+    try {
+      userCredential =
+          await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: user.email!,
+        password: password,
+      );
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'weak-password') {
+        showSnackBar(context, 'The password provided is too weak.');
+        return;
+      } else if (e.code == 'email-already-in-use') {
+        showSnackBar(context, 'The account already exists for that email.');
+        return;
+      }
+    } catch (e) {
+      showSnackBar(context, e.toString());
+      return;
+    }
+
+    user.userId = userCredential.user!.uid;
+
+    Reference ref = FirebaseStorage.instance
+        .ref()
+        .child('user_image')
+        .child('${userCredential.user!.uid}.jpg');
+
+    UploadTask uploadTask;
+    if (imageController.image != null) {
+      uploadTask = ref.putFile(imageController.image!);
+    } else {
+      uploadTask = ref.putString(
+          await getImageFileFromAssets('images/defaultAvatar.jpg'),
+          format: PutStringFormat.base64);
+    }
+    final snapshot = await uploadTask.whenComplete(() => null);
+    user.profilePicture = await snapshot.ref.getDownloadURL();
+
+    await FirebaseFirestore.instance
+        .collection('Users')
+        .doc(userCredential.user!.uid)
+        .set({
+      'userId': user.userId,
+      'displayName': user.displayName,
+      'email': user.email,
+      'team': user.team,
+      'role': user.role,
+      'dateOfBirth': user.dateOfBirth,
+      'joinedAt': user.joinedAt,
+      'profilePicture': user.profilePicture,
+      'about': user.about,
+    });
+    loadingControl.loading = false;
+    showBar.call();
   }
 
   void showSnackBar(BuildContext context, String text) {

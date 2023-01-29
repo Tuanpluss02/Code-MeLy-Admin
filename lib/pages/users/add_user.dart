@@ -1,15 +1,10 @@
-import 'dart:convert';
-import 'dart:io';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:mely_admin/controllers/image_picker.dart';
+import 'package:mely_admin/controllers/loading_control.dart';
 import 'package:mely_admin/models/chip_filter.dart';
 import 'package:mely_admin/models/user.dart';
+import 'package:mely_admin/services/auth.dart';
 import 'package:mely_admin/styles/app_styles.dart';
 
 class AddUser extends StatefulWidget {
@@ -21,91 +16,26 @@ class AddUser extends StatefulWidget {
 
 class _AddUserState extends State<AddUser> {
   final imageController = Get.find<ImageController>();
-  UserInformation user = UserInformation();
-  RxBool isLoading = false.obs;
+  final loadController = Get.find<LoadingControl>();
+  UserInformation user = UserInformation(
+      userId: '',
+      displayName: 'Code MeLy',
+      email: 'contact@codemely.dart',
+      team: 'Techincal',
+      dateOfBirth: '01/01/2000',
+      profilePicture: '',
+      about: 'A member of Code MeLy',
+      role: 'Member');
+  // RxBool isLoading = false.obs;
   final _formKey = GlobalKey<FormState>();
   RxString dateOfBirth = ''.obs;
   String password = 'Codemely@123';
-
-  Future<String> getImageFileFromAssets(String path) async {
-    final byteData = await rootBundle.load('assets/$path');
-    Uint8List fileByte = byteData.buffer
-        .asUint8List(byteData.offsetInBytes, byteData.lengthInBytes);
-    String basestring = base64.encode(fileByte);
-    return basestring;
-  }
-
-  Future<void> registerUser(VoidCallback showBar) async {
-    late UserCredential userCredential;
-    final isValid = _formKey.currentState!.validate();
-    if (!isValid) {
-      return;
-    }
-    _formKey.currentState!.save();
-    isLoading.value = true;
-
-    try {
-      userCredential =
-          await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: user.email!,
-        password: password,
-      );
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'weak-password') {
-        showSnackBar(context, 'The password provided is too weak.');
-        return;
-      } else if (e.code == 'email-already-in-use') {
-        showSnackBar(context, 'The account already exists for that email.');
-        return;
-      }
-    } catch (e) {
-      showSnackBar(context, e.toString());
-      return;
-    }
-
-    user.userId = userCredential.user!.uid;
-
-    Reference ref = FirebaseStorage.instance
-        .ref()
-        .child('user_image')
-        .child('${userCredential.user!.uid}.jpg');
-
-    UploadTask uploadTask;
-    if (imageController.image != null) {
-      uploadTask = ref.putFile(imageController.image!);
-    } else {
-      uploadTask = ref.putString(
-          await getImageFileFromAssets('images/defaultAvatar.jpg'),
-          format: PutStringFormat.base64);
-    }
-    final snapshot = await uploadTask.whenComplete(() => null);
-    user.profilePicture = await snapshot.ref.getDownloadURL();
-
-    await FirebaseFirestore.instance
-        .collection('Users')
-        .doc(userCredential.user!.uid)
-        .set({
-      'userId': user.userId,
-      'displayName': user.displayName,
-      'email': user.email,
-      'team': user.team,
-      'role': user.role,
-      'dateOfBirth': user.dateOfBirth,
-      'joinedAt': user.joinedAt,
-      'profilePicture': user.profilePicture,
-      'about': user.about,
-    });
-    isLoading.value = false;
-    showBar.call();
-  }
 
   @override
   void initState() {
     super.initState();
     user.joinedAt =
         '${DateTime.now()}'.split(' ')[0].split('-').reversed.join('/');
-    user.about = 'A member of Code MeLy';
-    user.role = 'Member';
   }
 
   @override
@@ -369,15 +299,29 @@ class _AddUserState extends State<AddUser> {
                   ),
                   const SizedBox(height: 10),
                   Center(
-                    child: Obx(() => isLoading.value
+                    child: Obx(() => loadController.loading
                         ? const CircularProgressIndicator()
                         : SizedBox(
                             // margin: const EdgeInsets.symmetric(horizontal: 10),
                             width: Get.width,
                             height: 40,
                             child: ElevatedButton(
-                              onPressed: () => registerUser(() => showSnackBar(
-                                  context, 'User added successfully')),
+                              onPressed: () {
+                                if (_formKey.currentState!.validate()) {
+                                  _formKey.currentState!.save();
+                                  AuthClass().registerUser(
+                                      user,
+                                      password,
+                                      imageController,
+                                      loadController,
+                                      context,
+                                      () => showSnackBar(
+                                          context, 'User added successfully'));
+                                } else {
+                                  showSnackBar(
+                                      context, 'Please fill all fields');
+                                }
+                              },
                               style: ElevatedButton.styleFrom(
                                 // padding: EdgeInsets.symmetric(horizontal: Get.width),
                                 backgroundColor: Colors.deepPurpleAccent,
@@ -399,25 +343,11 @@ class _AddUserState extends State<AddUser> {
   }
 }
 
-class ImageController extends GetxController {
-  static ImageController get to => Get.find();
-  File? image;
-  final picker = ImagePicker();
-  Future<void> getImage() async {
-    final pickedFile =
-        await picker.pickImage(source: ImageSource.gallery, imageQuality: 100);
-
-    if (pickedFile != null) {
-      image = File(pickedFile.path);
-    }
-    update();
-  }
-}
-
 void showSnackBar(BuildContext context, String text) {
   final snackBar = SnackBar(content: Text(text));
   ScaffoldMessenger.of(context).showSnackBar(snackBar);
 }
+
 // Future<String> datePicker(bool hasTime) async {
   //   final DateTime? picked = await showDatePicker(
   //     context: context,

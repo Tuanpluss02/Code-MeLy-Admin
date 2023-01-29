@@ -1,6 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:get/get.dart';
 import 'package:mely_admin/styles/app_styles.dart';
+import 'package:mely_admin/widgets/fab_custom.dart';
 
 class UserView extends StatefulWidget {
   final QueryDocumentSnapshot docs;
@@ -11,19 +14,35 @@ class UserView extends StatefulWidget {
 }
 
 class _UserViewState extends State<UserView> {
+  late ScrollController _fabcontroller;
+  late RxBool _isFabVisible;
+  @override
+  void initState() {
+    super.initState();
+    _fabcontroller = ScrollController();
+    _isFabVisible = true.obs;
+    _fabcontroller.addListener(() {
+      if (_fabcontroller.position.userScrollDirection ==
+          ScrollDirection.forward) {
+        // _isFabVisible.value = !_isFabVisible.value ? true : false;
+        if (_isFabVisible.value == false) _isFabVisible.value = true;
+      } else if (_fabcontroller.position.userScrollDirection ==
+          ScrollDirection.reverse) {
+        // _isFabVisible.value = _isFabVisible.value ? false : true;
+        if (_isFabVisible.value == true) _isFabVisible.value = false;
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     // Size size = Get.size;
     Size size = MediaQuery.of(context).size;
     return SafeArea(
       child: Scaffold(
-        // backgroundColor: (widget.docs['role'] == 'Founder' ||
-        //         widget.docs['role'] == 'Co-Founder' ||
-        //         widget.docs['role'] == 'Leader')
-        //     ? AppStyle.adminColor
-        //     : AppStyle.memberColor,
         backgroundColor: Colors.yellow.shade100,
         body: SingleChildScrollView(
+          controller: _fabcontroller,
           child: Stack(children: [
             ClipRRect(
               borderRadius: const BorderRadius.only(
@@ -138,6 +157,16 @@ class _UserViewState extends State<UserView> {
               ),
             ),
           ]),
+        ),
+        floatingActionButton: Obx(
+          () => AnimatedOpacity(
+              duration: const Duration(milliseconds: 200),
+              opacity: _isFabVisible.value ? 1 : 0,
+              child: FancyFab(
+                onPressed: () {},
+                tooltip: 'Edit',
+                icon: const Icon(Icons.arrow_back),
+              )),
         ),
       ),
     );
