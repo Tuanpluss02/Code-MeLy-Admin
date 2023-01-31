@@ -16,6 +16,7 @@ class AppStyle {
     Colors.blueGrey.shade100,
     Colors.blue.shade100,
   ];
+
   static Color memberColor = Colors.blue.shade100;
   static Color adminColor = Colors.orange.shade100;
 

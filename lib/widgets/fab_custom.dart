@@ -3,15 +3,22 @@
 import 'package:flutter/material.dart';
 
 class FancyFab extends StatefulWidget {
-  final Function() onPressed;
-  final String tooltip;
-  final Icon icon;
+  final Function() onPressed1;
+  final String tooltip1;
+  final Icon icon1;
+  final Function() onPressed2;
+  final String tooltip2;
+  final Icon icon2;
 
   const FancyFab(
-      {super.key,
-      required this.onPressed,
-      required this.tooltip,
-      required this.icon});
+      {Key? key,
+      required this.onPressed1,
+      required this.tooltip1,
+      required this.icon1,
+      required this.onPressed2,
+      required this.tooltip2,
+      required this.icon2})
+      : super(key: key);
 
   @override
   State<FancyFab> createState() => _FancyFabState();
@@ -37,7 +44,7 @@ class _FancyFabState extends State<FancyFab>
     _animateIcon =
         Tween<double>(begin: 0.0, end: 1.0).animate(_animationController);
     _buttonColor = ColorTween(
-      begin: Colors.blue,
+      begin: Colors.purple,
       end: Colors.red,
     ).animate(CurvedAnimation(
       parent: _animationController,
@@ -76,32 +83,35 @@ class _FancyFabState extends State<FancyFab>
     isOpened = !isOpened;
   }
 
-  Widget add() {
-    return const FloatingActionButton(
-      onPressed: null,
-      tooltip: 'Add',
-      child: Icon(Icons.add),
+  // Widget add() {
+  //   return const FloatingActionButton(
+  //     onPressed: null,
+  //     tooltip: 'Add',
+  //     child: Icon(Icons.add),
+  //   );
+  // }
+
+  Widget button2() {
+    return FloatingActionButton(
+      backgroundColor: Colors.purple,
+      onPressed: widget.onPressed2,
+      tooltip: widget.tooltip2,
+      child: widget.icon2,
     );
   }
 
-  Widget image() {
-    return const FloatingActionButton(
-      onPressed: null,
-      tooltip: 'Image',
-      child: Icon(Icons.image),
-    );
-  }
-
-  Widget inbox() {
-    return const FloatingActionButton(
-      onPressed: null,
-      tooltip: 'Inbox',
-      child: Icon(Icons.inbox),
+  Widget button1() {
+    return FloatingActionButton(
+      backgroundColor: Colors.purple,
+      onPressed: widget.onPressed1,
+      tooltip: widget.tooltip1,
+      child: widget.icon1,
     );
   }
 
   Widget toggle() {
     return FloatingActionButton(
+      // backgroundColor: Colors.purple,
       backgroundColor: _buttonColor.value,
       onPressed: animate,
       tooltip: 'Toggle',
@@ -117,21 +127,21 @@ class _FancyFabState extends State<FancyFab>
     return Column(
       mainAxisAlignment: MainAxisAlignment.end,
       children: <Widget>[
-        Transform(
-          transform: Matrix4.translationValues(
-            0.0,
-            _translateButton.value * 3.0,
-            0.0,
-          ),
-          child: add(),
-        ),
+        // Transform(
+        //   transform: Matrix4.translationValues(
+        //     0.0,
+        //     _translateButton.value * 3.0,
+        //     0.0,
+        //   ),
+        //   child: add(),
+        // ),
         Transform(
           transform: Matrix4.translationValues(
             0.0,
             _translateButton.value * 2.0,
             0.0,
           ),
-          child: image(),
+          child: button2(),
         ),
         Transform(
           transform: Matrix4.translationValues(
@@ -139,7 +149,7 @@ class _FancyFabState extends State<FancyFab>
             _translateButton.value,
             0.0,
           ),
-          child: inbox(),
+          child: button1(),
         ),
         toggle(),
       ],

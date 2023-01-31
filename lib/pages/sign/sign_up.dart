@@ -140,7 +140,6 @@ class _SignUpState extends State<SignUp> {
                           if (!AuthClass().emailValidator(value)) {
                             return 'Please enter a valid email';
                           }
-
                           return null;
                         },
                         onSaved: (val) {

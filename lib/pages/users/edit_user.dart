@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mely_admin/controllers/image_picker.dart';
@@ -7,35 +8,40 @@ import 'package:mely_admin/models/user.dart';
 import 'package:mely_admin/services/auth.dart';
 import 'package:mely_admin/styles/app_styles.dart';
 
-class AddUser extends StatefulWidget {
-  const AddUser({super.key});
+Map<String, int> teams = {
+  'Technical': 0,
+  'Communication': 1,
+  'Security': 2,
+  'Agorithm': 3,
+};
+
+Map<String, int> roles = {
+  'Founder': 0,
+  'Co-Founder': 1,
+  'Leader': 2,
+  'Member': 3,
+};
+
+class EditUser extends StatefulWidget {
+  final QueryDocumentSnapshot docs;
+  const EditUser({super.key, required this.docs});
 
   @override
-  State<AddUser> createState() => _AddUserState();
+  State<EditUser> createState() => _AddUserState();
 }
 
-class _AddUserState extends State<AddUser> {
+class _AddUserState extends State<EditUser> {
   final imageController = Get.find<ImageController>();
   final loadController = Get.find<LoadingControl>();
-  UserInformation user = UserInformation(
-      userId: '',
-      displayName: 'Code MeLy',
-      email: 'contact@codemely.dart',
-      team: 'Techincal',
-      dateOfBirth: '01/01/2000',
-      profilePicture: '',
-      about: 'A member of Code MeLy',
-      role: 'Member');
-  // RxBool isLoading = false.obs;
+  late UserInformation user;
   final _formKey = GlobalKey<FormState>();
   RxString dateOfBirth = ''.obs;
   String password = 'Codemely@123';
 
   @override
   void initState() {
+    user = UserInformation.fromJson(widget.docs.data() as Map<String, dynamic>);
     super.initState();
-    user.joinedAt =
-        '${DateTime.now()}'.split(' ')[0].split('-').reversed.join('/');
   }
 
   @override
@@ -47,7 +53,7 @@ class _AddUserState extends State<AddUser> {
             color: Colors.black, //change your color here
           ),
           title: Text(
-            'Add user',
+            'Edit user',
             style: AppStyle.title.copyWith(fontSize: 25),
           ),
           centerTitle: true,
@@ -97,6 +103,7 @@ class _AddUserState extends State<AddUser> {
                       // const SizedBox(height: 10),
                       Expanded(
                         child: TextFormField(
+                          initialValue: widget.docs['displayName'],
                           decoration: InputDecoration(
                             enabledBorder: OutlineInputBorder(
                               borderSide: const BorderSide(
@@ -122,6 +129,7 @@ class _AddUserState extends State<AddUser> {
                       const SizedBox(width: 10),
                       Expanded(
                         child: TextFormField(
+                          initialValue: widget.docs['dateOfBirth'],
                           decoration: InputDecoration(
                             enabledBorder: OutlineInputBorder(
                               borderSide: const BorderSide(
@@ -149,67 +157,40 @@ class _AddUserState extends State<AddUser> {
                     ],
                   ),
                   const SizedBox(height: 10),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: TextFormField(
-                          decoration: InputDecoration(
-                            enabledBorder: OutlineInputBorder(
-                              borderSide: const BorderSide(
-                                  width: 1, color: Colors.black45),
-                              borderRadius: BorderRadius.circular(50.0),
-                            ),
-                            labelText: 'Email',
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(50.0),
-                            ),
-                          ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter email';
-                            }
-                            return null;
-                          },
-                          onSaved: (newValue) {
-                            user.email = newValue;
-                          },
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                          child: TextFormField(
-                        decoration: InputDecoration(
-                          enabledBorder: OutlineInputBorder(
-                            borderSide: const BorderSide(
-                                width: 1, color: Colors.black45),
-                            borderRadius: BorderRadius.circular(50.0),
-                          ),
-                          labelText: 'Password',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(50.0),
-                          ),
-                        ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter password';
-                          }
-                          return null;
-                        },
-                        onSaved: (newValue) {
-                          password = newValue!;
-                        },
-                      ))
-                    ],
-                  ),
-                  const SizedBox(height: 10),
                   TextFormField(
+                    initialValue: widget.docs['email'],
                     decoration: InputDecoration(
                       enabledBorder: OutlineInputBorder(
                         borderSide:
                             const BorderSide(width: 1, color: Colors.black45),
                         borderRadius: BorderRadius.circular(50.0),
                       ),
-                      labelText: 'Join date: ${user.joinedAt}',
+                      labelText: 'Email',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(50.0),
+                      ),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter email';
+                      }
+                      return null;
+                    },
+                    onSaved: (newValue) {
+                      user.email = newValue;
+                    },
+                  ),
+
+                  const SizedBox(height: 10),
+                  TextFormField(
+                    initialValue: widget.docs['joinedAt'],
+                    decoration: InputDecoration(
+                      enabledBorder: OutlineInputBorder(
+                        borderSide:
+                            const BorderSide(width: 1, color: Colors.black45),
+                        borderRadius: BorderRadius.circular(50.0),
+                      ),
+                      labelText: 'Join date',
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(50.0),
                       ),
@@ -224,6 +205,7 @@ class _AddUserState extends State<AddUser> {
                   TextFormField(
                     maxLines: 5,
                     minLines: 3,
+                    initialValue: widget.docs['about'],
                     decoration: InputDecoration(
                       enabledBorder: OutlineInputBorder(
                         borderSide:
@@ -252,7 +234,8 @@ class _AddUserState extends State<AddUser> {
                         horizontal: 10, vertical: 10),
                     height: 40,
                     child: ChipsFilter(
-                      selected: 0, // Select the second filter as default
+                      selected: teams[widget.docs[
+                          'team']]!, // Select the second filter as default
                       filters: const [
                         Filter(label: "Technical", icon: Icons.military_tech),
                         Filter(label: "Communication", icon: Icons.people),
@@ -274,7 +257,8 @@ class _AddUserState extends State<AddUser> {
                         horizontal: 10, vertical: 10),
                     height: 40,
                     child: ChipsFilter(
-                      selected: 0, // Select the second filter as default
+                      selected: roles[widget.docs[
+                          'role']]!, // Select the second filter as default
                       filters: const [
                         Filter(
                             label: "Founder",
@@ -290,42 +274,37 @@ class _AddUserState extends State<AddUser> {
                   ),
                   const SizedBox(height: 10),
                   Center(
-                    child: Obx(() => loadController.loading
-                        ? const CircularProgressIndicator()
-                        : SizedBox(
-                            // margin: const EdgeInsets.symmetric(horizontal: 10),
-                            width: Get.width,
-                            height: 40,
-                            child: ElevatedButton(
-                              onPressed: () {
-                                if (_formKey.currentState!.validate()) {
-                                  _formKey.currentState!.save();
-                                  AuthClass().registerUser(
-                                      user,
-                                      password,
-                                      imageController,
-                                      loadController,
-                                      context,
-                                      () => showSnackBar(
-                                          context, 'User added successfully'));
-                                } else {
-                                  showSnackBar(
-                                      context, 'Please fill all fields');
-                                }
-                              },
-                              style: ElevatedButton.styleFrom(
-                                // padding: EdgeInsets.symmetric(horizontal: Get.width),
-                                backgroundColor: Colors.deepPurpleAccent,
-                                shape: const StadiumBorder(),
-                              ),
-                              child: const Text(
-                                "Register new member",
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 18),
-                              ),
-                            ),
-                          )),
-                  )
+                      child: SizedBox(
+                    // margin: const EdgeInsets.symmetric(horizontal: 10),
+                    width: Get.width,
+                    height: 40,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        if (_formKey.currentState!.validate()) {
+                          _formKey.currentState!.save();
+                          AuthClass().registerUser(
+                              user,
+                              password,
+                              imageController,
+                              loadController,
+                              context,
+                              () => showSnackBar(
+                                  context, 'User added successfully'));
+                        } else {
+                          showSnackBar(context, 'Please fill all fields');
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        // padding: EdgeInsets.symmetric(horizontal: Get.width),
+                        backgroundColor: Colors.deepPurpleAccent,
+                        shape: const StadiumBorder(),
+                      ),
+                      child: const Text(
+                        "Save",
+                        style: TextStyle(color: Colors.white, fontSize: 18),
+                      ),
+                    ),
+                  )),
                 ],
               ),
             ),
@@ -338,26 +317,3 @@ void showSnackBar(BuildContext context, String text) {
   final snackBar = SnackBar(content: Text(text));
   ScaffoldMessenger.of(context).showSnackBar(snackBar);
 }
-
-// Future<String> datePicker(bool hasTime) async {
-  //   final DateTime? picked = await showDatePicker(
-  //     context: context,
-  //     initialDate: DateTime.now(),
-  //     firstDate: DateTime(1990),
-  //     lastDate: DateTime(2050),
-  //   );
-  //   if (picked != null) {
-  //     if (hasTime) {
-  //       final TimeOfDay? time = await showTimePicker(
-  //         context: context,
-  //         initialTime: TimeOfDay.now(),
-  //       );
-  //       if (time != null) {
-  //         return '${'${picked.toLocal()}'.split(' ')[0].split('-').reversed.join('/')} ${time.format(context)}';
-  //         // return
-  //       }
-  //     }  
-  //     return '${picked.toLocal()}'.split(' ')[0].split('-').reversed.join('/');
-  //   }
-  //   return '';
-  // }

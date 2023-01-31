@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
+import 'package:mely_admin/pages/users/edit_user.dart';
 import 'package:mely_admin/styles/app_styles.dart';
 import 'package:mely_admin/widgets/fab_custom.dart';
 
@@ -32,6 +33,33 @@ class _UserViewState extends State<UserView> {
         if (_isFabVisible.value == true) _isFabVisible.value = false;
       }
     });
+  }
+
+  Future<void> deleteUser(VoidCallback pop) async {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text('Delete User'),
+            content: const Text('Are you sure you want to delete this user?'),
+            actions: [
+              TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text('Cancel')),
+              TextButton(
+                  onPressed: () async {
+                    await FirebaseFirestore.instance
+                        .collection('Users')
+                        .doc(widget.docs.id)
+                        .delete();
+                    pop.call();
+                  },
+                  child: const Text('Delete'))
+            ],
+          );
+        });
   }
 
   @override
@@ -120,29 +148,25 @@ class _UserViewState extends State<UserView> {
                     thickness: 1,
                   ),
                   const SizedBox(height: 10),
-                  Row(
-                    children: [
-                      Text.rich(TextSpan(
-                          text: 'Email: ',
-                          style: AppStyle.title,
-                          children: <InlineSpan>[
-                            TextSpan(
-                              text: widget.docs['email'],
-                              style: AppStyle.content,
-                            )
-                          ])),
-                      const SizedBox(width: 25),
-                      Text.rich(TextSpan(
-                          text: 'Joined At: ',
-                          style: AppStyle.title,
-                          children: <InlineSpan>[
-                            TextSpan(
-                              text: widget.docs['joinedAt'],
-                              style: AppStyle.content,
-                            )
-                          ])),
-                    ],
-                  ),
+                  Text.rich(TextSpan(
+                      text: 'Email: ',
+                      style: AppStyle.title,
+                      children: <InlineSpan>[
+                        TextSpan(
+                          text: widget.docs['email'],
+                          style: AppStyle.content,
+                        )
+                      ])),
+                  const SizedBox(height: 10),
+                  Text.rich(TextSpan(
+                      text: 'Joined At: ',
+                      style: AppStyle.title,
+                      children: <InlineSpan>[
+                        TextSpan(
+                          text: widget.docs['joinedAt'],
+                          style: AppStyle.content,
+                        )
+                      ])),
                   const SizedBox(height: 10),
                   Text.rich(TextSpan(
                       text: 'About: ',
@@ -163,12 +187,28 @@ class _UserViewState extends State<UserView> {
               duration: const Duration(milliseconds: 200),
               opacity: _isFabVisible.value ? 1 : 0,
               child: FancyFab(
-                onPressed: () {},
-                tooltip: 'Edit',
-                icon: const Icon(Icons.arrow_back),
+                onPressed1: () => Get.to(
+                  () => EditUser(
+                    docs: widget.docs,
+                  ),
+                ),
+                tooltip1: 'Edit',
+                icon1: const Icon(Icons.edit),
+                onPressed2: () => deleteUser(() {
+                  showSnackBar(context, 'User deleted successfully');
+                  Get.back();
+                  Get.back();
+                }),
+                tooltip2: 'Delete',
+                icon2: const Icon(Icons.delete),
               )),
         ),
       ),
     );
   }
+}
+
+void showSnackBar(BuildContext context, String text) {
+  final snackBar = SnackBar(content: Text(text));
+  ScaffoldMessenger.of(context).showSnackBar(snackBar);
 }
