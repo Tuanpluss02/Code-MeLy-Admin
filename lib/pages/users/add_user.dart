@@ -83,7 +83,7 @@ class _AddUserState extends State<AddUser> {
                         ),
                         TextButton.icon(
                           onPressed: () async {
-                            await imageController.getImage();
+                            await imageController.getImage(context);
                           },
                           icon: const Icon(Icons.image),
                           label: const Text('Pick Image'),

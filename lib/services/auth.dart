@@ -210,6 +210,31 @@ class AuthClass {
     showBar.call();
   }
 
+  Future<void> updateUserInformation(UserInformation user,
+      LoadingControl loadingControl, BuildContext context) async {
+    loadingControl.loading = true;
+    try {
+      await FirebaseFirestore.instance
+          .collection('Users')
+          .doc(user.userId)
+          .set({
+        'userId': user.userId,
+        'displayName': user.displayName,
+        'email': user.email,
+        'team': user.team,
+        'role': user.role,
+        'dateOfBirth': user.dateOfBirth,
+        'joinedAt': user.joinedAt,
+        'profilePicture': user.profilePicture,
+        'about': user.about,
+      });
+      loadingControl.loading = false;
+      showSnackBar(context, 'User information updated successfully');
+    } catch (e) {
+      showSnackBar(context, 'Failed to update user information');
+    }
+  }
+
   void showSnackBar(BuildContext context, String text) {
     final snackBar = SnackBar(content: Text(text));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);

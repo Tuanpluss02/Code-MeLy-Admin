@@ -34,6 +34,7 @@ class _AddUserState extends State<EditUser> {
   final imageController = Get.find<ImageController>();
   final loadController = Get.find<LoadingControl>();
   late UserInformation user;
+  RxBool isChanged = false.obs;
   final _formKey = GlobalKey<FormState>();
   RxString dateOfBirth = ''.obs;
   String password = 'Codemely@123';
@@ -44,272 +45,327 @@ class _AddUserState extends State<EditUser> {
     super.initState();
   }
 
+  void saveInfor() {
+    if (isChanged.value) {
+      if (_formKey.currentState!.validate()) {
+        _formKey.currentState!.save();
+        AuthClass().updateUserInformation(
+          user,
+          loadController,
+          context,
+        );
+      } else {
+        showSnackBar(context, 'Please fill all fields');
+      }
+    }
+  }
+
+  Future<bool> _requestPop() {
+    isChanged.value
+        ? showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text('Are you sure?'),
+              content: const Text('You have unsaved changes.'),
+              actions: [
+                TextButton(
+                  onPressed: () => Get.back(),
+                  child: const Text('Cancel'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Get.back();
+                    Get.back();
+                  },
+                  child: const Text('Discard'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    saveInfor();
+                    Get.back();
+                    Get.back();
+                  },
+                  child: const Text('Save'),
+                ),
+              ],
+            ),
+          )
+        : Navigator.pop(context);
+    return Future.value(false);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        backgroundColor: Colors.white,
-        appBar: AppBar(
-          iconTheme: const IconThemeData(
-            color: Colors.black, //change your color here
-          ),
-          title: Text(
-            'Edit user',
-            style: AppStyle.title.copyWith(fontSize: 25),
-          ),
-          centerTitle: true,
+    return WillPopScope(
+      onWillPop: () => _requestPop(),
+      child: Scaffold(
           backgroundColor: Colors.white,
-          elevation: 0,
-        ),
-        body: SingleChildScrollView(
-          child: Container(
-            margin: const EdgeInsets.symmetric(horizontal: 10),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 10),
-                  Center(
-                    child: Column(
+          appBar: AppBar(
+            iconTheme: const IconThemeData(
+              color: Colors.black,
+            ),
+            title: Text(
+              'Edit user',
+              style: AppStyle.title.copyWith(fontSize: 25),
+            ),
+            centerTitle: true,
+            backgroundColor: Colors.white,
+            elevation: 0,
+          ),
+          body: SingleChildScrollView(
+            child: Container(
+              margin: const EdgeInsets.symmetric(horizontal: 10),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 10),
+                    Center(
+                      child: Column(
+                        children: [
+                          GetBuilder<ImageController>(
+                            builder: (_) {
+                              return ClipOval(
+                                child: SizedBox.fromSize(
+                                  size: const Size.fromRadius(80),
+                                  child: imageController.image != null
+                                      ? Image.file(imageController.image!,
+                                          fit: BoxFit.cover)
+                                      : Image.asset(
+                                          'assets/images/defaultAvatar.jpg',
+                                          fit: BoxFit.cover),
+                                ),
+                              );
+                            },
+                          ),
+                          TextButton.icon(
+                            onPressed: () async {
+                              await imageController.getImage(context);
+                              isChanged.value = true;
+                            },
+                            icon: const Icon(Icons.image),
+                            label: const Text('Pick Image'),
+                          ),
+                        ],
+                      ),
+                    ),
+                    // const SizedBox(width: 15),
+                    Row(
                       children: [
-                        GetBuilder<ImageController>(
-                          builder: (_) {
-                            return ClipOval(
-                              child: SizedBox.fromSize(
-                                size: const Size.fromRadius(80), // Image radius
-                                child: imageController.image != null
-                                    ? Image.file(imageController.image!,
-                                        fit: BoxFit.cover)
-                                    : Image.asset(
-                                        'assets/images/defaultAvatar.jpg',
-                                        fit: BoxFit.cover),
+                        // const SizedBox(height: 10),
+                        Expanded(
+                          child: TextFormField(
+                            onChanged: (value) {
+                              isChanged.value = true;
+                            },
+                            initialValue: widget.docs['displayName'],
+                            decoration: InputDecoration(
+                              enabledBorder: OutlineInputBorder(
+                                borderSide: const BorderSide(
+                                    width: 1, color: Colors.black45),
+                                borderRadius: BorderRadius.circular(50.0),
                               ),
-                            );
-                          },
+                              labelText: 'Full name',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(50.0),
+                              ),
+                            ),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter full name';
+                              }
+                              return null;
+                            },
+                            onSaved: (newValue) {
+                              user.displayName = newValue;
+                            },
+                          ),
                         ),
-                        TextButton.icon(
-                          onPressed: () async {
-                            await imageController.getImage();
-                          },
-                          icon: const Icon(Icons.image),
-                          label: const Text('Pick Image'),
-                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: TextFormField(
+                            onChanged: (value) {
+                              isChanged.value = true;
+                            },
+                            initialValue: widget.docs['dateOfBirth'],
+                            decoration: InputDecoration(
+                              enabledBorder: OutlineInputBorder(
+                                borderSide: const BorderSide(
+                                  width: 1,
+                                  color: Colors.black45,
+                                ),
+                                borderRadius: BorderRadius.circular(50.0),
+                              ),
+                              labelText: 'Date of birth',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(50.0),
+                              ),
+                            ),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter date of birth';
+                              }
+                              return null;
+                            },
+                            onSaved: (newValue) {
+                              user.dateOfBirth = newValue;
+                            },
+                          ),
+                        )
                       ],
                     ),
-                  ),
-                  // const SizedBox(width: 15),
-                  Row(
-                    children: [
-                      // const SizedBox(height: 10),
-                      Expanded(
-                        child: TextFormField(
-                          initialValue: widget.docs['displayName'],
-                          decoration: InputDecoration(
-                            enabledBorder: OutlineInputBorder(
-                              borderSide: const BorderSide(
-                                  width: 1, color: Colors.black45),
-                              borderRadius: BorderRadius.circular(50.0),
-                            ),
-                            labelText: 'Full name',
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(50.0),
-                            ),
-                          ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter full name';
-                            }
-                            return null;
-                          },
-                          onSaved: (newValue) {
-                            user.displayName = newValue;
-                          },
+                    const SizedBox(height: 10),
+                    TextFormField(
+                      onChanged: (value) {
+                        isChanged.value = true;
+                      },
+                      initialValue: widget.docs['email'],
+                      decoration: InputDecoration(
+                        enabledBorder: OutlineInputBorder(
+                          borderSide:
+                              const BorderSide(width: 1, color: Colors.black45),
+                          borderRadius: BorderRadius.circular(50.0),
+                        ),
+                        labelText: 'Email',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(50.0),
                         ),
                       ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: TextFormField(
-                          initialValue: widget.docs['dateOfBirth'],
-                          decoration: InputDecoration(
-                            enabledBorder: OutlineInputBorder(
-                              borderSide: const BorderSide(
-                                width: 1,
-                                color: Colors.black45,
-                              ),
-                              borderRadius: BorderRadius.circular(50.0),
-                            ),
-                            labelText: 'Date of birth',
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(50.0),
-                            ),
-                          ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter date of birth';
-                            }
-                            return null;
-                          },
-                          onSaved: (newValue) {
-                            user.dateOfBirth = newValue;
-                          },
-                        ),
-                      )
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  TextFormField(
-                    initialValue: widget.docs['email'],
-                    decoration: InputDecoration(
-                      enabledBorder: OutlineInputBorder(
-                        borderSide:
-                            const BorderSide(width: 1, color: Colors.black45),
-                        borderRadius: BorderRadius.circular(50.0),
-                      ),
-                      labelText: 'Email',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(50.0),
-                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter email';
+                        }
+                        return null;
+                      },
+                      onSaved: (newValue) {
+                        user.email = newValue;
+                      },
                     ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter email';
-                      }
-                      return null;
-                    },
-                    onSaved: (newValue) {
-                      user.email = newValue;
-                    },
-                  ),
 
-                  const SizedBox(height: 10),
-                  TextFormField(
-                    initialValue: widget.docs['joinedAt'],
-                    decoration: InputDecoration(
-                      enabledBorder: OutlineInputBorder(
-                        borderSide:
-                            const BorderSide(width: 1, color: Colors.black45),
-                        borderRadius: BorderRadius.circular(50.0),
-                      ),
-                      labelText: 'Join date',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(50.0),
-                      ),
-                    ),
-                    onSaved: (newValue) {
-                      if (newValue != null && newValue.isNotEmpty) {
-                        user.joinedAt = newValue;
-                      }
-                    },
-                  ),
-                  const SizedBox(height: 10),
-                  TextFormField(
-                    maxLines: 5,
-                    minLines: 3,
-                    initialValue: widget.docs['about'],
-                    decoration: InputDecoration(
-                      enabledBorder: OutlineInputBorder(
-                        borderSide:
-                            const BorderSide(width: 1, color: Colors.black45),
-                        borderRadius: BorderRadius.circular(50.0),
-                      ),
-                      labelText: 'About ',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(50.0),
-                      ),
-                    ),
-                    onSaved: (newValue) {
-                      user.about = newValue;
-                    },
-                    // onChanged: (value) {
-                    //   user.phoneNumber = value;
-                    // },
-                  ),
-                  const SizedBox(height: 10),
-                  const Text(
-                    'Choose team: ',
-                    textAlign: TextAlign.start,
-                  ),
-                  Container(
-                    margin: const EdgeInsets.symmetric(
-                        horizontal: 10, vertical: 10),
-                    height: 40,
-                    child: ChipsFilter(
-                      selected: teams[widget.docs[
-                          'team']]!, // Select the second filter as default
-                      filters: const [
-                        Filter(label: "Technical", icon: Icons.military_tech),
-                        Filter(label: "Communication", icon: Icons.people),
-                        Filter(label: "Security", icon: Icons.security),
-                        Filter(label: "Algorithm", icon: Icons.safety_check),
-                      ],
-                      onTap: () {
-                        user.team = getSelectedFilter();
+                    const SizedBox(height: 10),
+                    TextFormField(
+                      onChanged: (value) {
+                        isChanged.value = true;
                       },
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  const Text(
-                    'Choose role: ',
-                    textAlign: TextAlign.start,
-                  ),
-                  Container(
-                    margin: const EdgeInsets.symmetric(
-                        horizontal: 10, vertical: 10),
-                    height: 40,
-                    child: ChipsFilter(
-                      selected: roles[widget.docs[
-                          'role']]!, // Select the second filter as default
-                      filters: const [
-                        Filter(
-                            label: "Founder",
-                            icon: Icons.person_outline_outlined),
-                        Filter(label: "Co-Founder", icon: Icons.person_outline),
-                        Filter(label: "Leader", icon: Icons.person_outline),
-                        Filter(label: "Member", icon: Icons.person_outline),
-                      ],
-                      onTap: () {
-                        user.role = getSelectedFilter();
-                      },
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Center(
-                      child: SizedBox(
-                    // margin: const EdgeInsets.symmetric(horizontal: 10),
-                    width: Get.width,
-                    height: 40,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        if (_formKey.currentState!.validate()) {
-                          _formKey.currentState!.save();
-                          AuthClass().registerUser(
-                              user,
-                              password,
-                              imageController,
-                              loadController,
-                              context,
-                              () => showSnackBar(
-                                  context, 'User added successfully'));
-                        } else {
-                          showSnackBar(context, 'Please fill all fields');
+                      initialValue: widget.docs['joinedAt'],
+                      decoration: InputDecoration(
+                        enabledBorder: OutlineInputBorder(
+                          borderSide:
+                              const BorderSide(width: 1, color: Colors.black45),
+                          borderRadius: BorderRadius.circular(50.0),
+                        ),
+                        labelText: 'Join date',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(50.0),
+                        ),
+                      ),
+                      onSaved: (newValue) {
+                        if (newValue != null && newValue.isNotEmpty) {
+                          user.joinedAt = newValue;
                         }
                       },
-                      style: ElevatedButton.styleFrom(
-                        // padding: EdgeInsets.symmetric(horizontal: Get.width),
-                        backgroundColor: Colors.deepPurpleAccent,
-                        shape: const StadiumBorder(),
+                    ),
+                    const SizedBox(height: 10),
+                    TextFormField(
+                      onChanged: (value) {
+                        isChanged.value = true;
+                      },
+                      maxLines: 5,
+                      minLines: 3,
+                      initialValue: widget.docs['about'],
+                      decoration: InputDecoration(
+                        enabledBorder: OutlineInputBorder(
+                          borderSide:
+                              const BorderSide(width: 1, color: Colors.black45),
+                          borderRadius: BorderRadius.circular(50.0),
+                        ),
+                        labelText: 'About ',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(50.0),
+                        ),
                       ),
-                      child: const Text(
-                        "Save",
-                        style: TextStyle(color: Colors.white, fontSize: 18),
+                      onSaved: (newValue) {
+                        user.about = newValue;
+                      },
+                      // onChanged: (value) {
+                      //   user.phoneNumber = value;
+                      // },
+                    ),
+                    const SizedBox(height: 10),
+                    const Text(
+                      'Choose team: ',
+                      textAlign: TextAlign.start,
+                    ),
+                    Container(
+                      margin: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 10),
+                      height: 40,
+                      child: ChipsFilter(
+                        selected: teams[widget.docs[
+                            'team']]!, // Select the second filter as default
+                        filters: const [
+                          Filter(label: "Technical", icon: Icons.military_tech),
+                          Filter(label: "Communication", icon: Icons.people),
+                          Filter(label: "Security", icon: Icons.security),
+                          Filter(label: "Algorithm", icon: Icons.safety_check),
+                        ],
+                        onTap: () {
+                          user.team = getSelectedFilter();
+                        },
                       ),
                     ),
-                  )),
-                ],
+                    const SizedBox(height: 10),
+                    const Text(
+                      'Choose role: ',
+                      textAlign: TextAlign.start,
+                    ),
+                    Container(
+                      margin: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 10),
+                      height: 40,
+                      child: ChipsFilter(
+                        selected: roles[widget.docs[
+                            'role']]!, // Select the second filter as default
+                        filters: const [
+                          Filter(
+                              label: "Founder",
+                              icon: Icons.person_outline_outlined),
+                          Filter(
+                              label: "Co-Founder", icon: Icons.person_outline),
+                          Filter(label: "Leader", icon: Icons.person_outline),
+                          Filter(label: "Member", icon: Icons.person_outline),
+                        ],
+                        onTap: () {
+                          user.role = getSelectedFilter();
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Center(
+                        child: SizedBox(
+                      // margin: const EdgeInsets.symmetric(horizontal: 10),
+                      width: Get.width,
+                      height: 40,
+                      child: ElevatedButton(
+                        onPressed: () => saveInfor(),
+                        style: ElevatedButton.styleFrom(
+                          // padding: EdgeInsets.symmetric(horizontal: Get.width),
+                          backgroundColor: Colors.deepPurpleAccent,
+                          shape: const StadiumBorder(),
+                        ),
+                        child: const Text(
+                          "Save",
+                          style: TextStyle(color: Colors.white, fontSize: 18),
+                        ),
+                      ),
+                    )),
+                  ],
+                ),
               ),
             ),
-          ),
-        ));
+          )),
+    );
   }
 }
 
