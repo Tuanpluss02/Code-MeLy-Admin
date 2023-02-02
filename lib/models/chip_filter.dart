@@ -123,6 +123,10 @@ class _ChipsFilterState extends State<ChipsFilter> {
   }
 }
 
+/// It returns the value of the variable selectedFilter
+///
+/// Returns:
+///   The value of the selectedFilter variable.
 String getSelectedFilter() {
   return selectedFilter;
 }

@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:mely_admin/styles/app_styles.dart';
 import 'package:mely_admin/widgets/events/event_card.dart';
-import 'package:mely_admin/widgets/events/event_detail.dart';
+import 'package:mely_admin/pages/events/event_detail.dart';
 
 class EventPage extends StatefulWidget {
   const EventPage({super.key});

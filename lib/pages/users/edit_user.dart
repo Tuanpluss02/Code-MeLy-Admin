@@ -23,7 +23,7 @@ Map<String, int> roles = {
 };
 
 class EditUser extends StatefulWidget {
-  final QueryDocumentSnapshot docs;
+  final DocumentSnapshot docs;
   const EditUser({super.key, required this.docs});
 
   @override
@@ -37,7 +37,7 @@ class _AddUserState extends State<EditUser> {
   RxBool isChanged = false.obs;
   final _formKey = GlobalKey<FormState>();
   RxString dateOfBirth = ''.obs;
-  String password = 'Codemely@123';
+  // String password = 'Codemely@123';
 
   @override
   void initState() {
@@ -45,6 +45,7 @@ class _AddUserState extends State<EditUser> {
     super.initState();
   }
 
+  /// If the form is valid, save the form and update the user information
   void saveInfor() {
     if (isChanged.value) {
       if (_formKey.currentState!.validate()) {
@@ -54,17 +55,25 @@ class _AddUserState extends State<EditUser> {
           loadController,
           context,
         );
+        isChanged.value = false;
       } else {
         showSnackBar(context, 'Please fill all fields');
       }
     }
   }
 
+  /// If the user has made changes to the form, show a dialog asking if they want to save, discard, or
+  /// cancel. If they choose to save, save the form. If they choose to discard, pop the dialog and the
+  /// page. If they choose to cancel, just pop the dialog. If the user hasn't made changes to the form,
+  /// just pop the page
+  ///
+  /// Returns:
+  ///   A Future.value(false)
   Future<bool> _requestPop() {
     isChanged.value
         ? showDialog(
             context: context,
-            builder: (context) => AlertDialog(
+            builder: (dialogContext) => AlertDialog(
               title: const Text('Are you sure?'),
               content: const Text('You have unsaved changes.'),
               actions: [
@@ -74,16 +83,16 @@ class _AddUserState extends State<EditUser> {
                 ),
                 TextButton(
                   onPressed: () {
-                    Get.back();
-                    Get.back();
+                    Navigator.pop(dialogContext);
+                    Navigator.pop(context);
                   },
                   child: const Text('Discard'),
                 ),
                 TextButton(
                   onPressed: () {
                     saveInfor();
-                    Get.back();
-                    Get.back();
+                    Navigator.pop(dialogContext);
+                    Navigator.pop(context);
                   },
                   child: const Text('Save'),
                 ),
@@ -311,6 +320,7 @@ class _AddUserState extends State<EditUser> {
                           Filter(label: "Algorithm", icon: Icons.safety_check),
                         ],
                         onTap: () {
+                          isChanged.value = true;
                           user.team = getSelectedFilter();
                         },
                       ),
@@ -337,29 +347,35 @@ class _AddUserState extends State<EditUser> {
                           Filter(label: "Member", icon: Icons.person_outline),
                         ],
                         onTap: () {
+                          isChanged.value = true;
                           user.role = getSelectedFilter();
                         },
                       ),
                     ),
                     const SizedBox(height: 10),
                     Center(
-                        child: SizedBox(
-                      // margin: const EdgeInsets.symmetric(horizontal: 10),
-                      width: Get.width,
-                      height: 40,
-                      child: ElevatedButton(
-                        onPressed: () => saveInfor(),
-                        style: ElevatedButton.styleFrom(
-                          // padding: EdgeInsets.symmetric(horizontal: Get.width),
-                          backgroundColor: Colors.deepPurpleAccent,
-                          shape: const StadiumBorder(),
-                        ),
-                        child: const Text(
-                          "Save",
-                          style: TextStyle(color: Colors.white, fontSize: 18),
-                        ),
-                      ),
-                    )),
+                        child: Obx(() => !loadController.loading
+                            ? SizedBox(
+                                // margin: const EdgeInsets.symmetric(horizontal: 10),
+                                width: Get.width,
+                                height: 40,
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    saveInfor();
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    // padding: EdgeInsets.symmetric(horizontal: Get.width),
+                                    backgroundColor: Colors.deepPurpleAccent,
+                                    shape: const StadiumBorder(),
+                                  ),
+                                  child: const Text(
+                                    "Save",
+                                    style: TextStyle(
+                                        color: Colors.white, fontSize: 18),
+                                  ),
+                                ),
+                              )
+                            : const CircularProgressIndicator())),
                   ],
                 ),
               ),

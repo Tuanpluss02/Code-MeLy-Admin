@@ -61,6 +61,7 @@ class UserInformation {
   String? get role => _role;
   String? get joinedAt => _joinedAt;
 
+  /// Setting the value of the class variable to the value of the parameter.
   set profilePicture(String? profilePicture) =>
       _profilePicture = profilePicture;
   set userId(String? userId) => _userId = userId;
@@ -72,6 +73,7 @@ class UserInformation {
   set joinedAt(String? joinedAt) => _joinedAt = joinedAt;
   set dateOfBirth(String? dateOfBirth) => _dateOfBirth = dateOfBirth;
 
+  /// Taking the values from the map and putting them into the class variables.
   UserInformation.fromJson(Map<String, dynamic> json) {
     _profilePicture = json['profilePicture'];
     _userId = json['userId'];
@@ -84,6 +86,10 @@ class UserInformation {
     _dateOfBirth = json['dateOfBirth'];
   }
 
+  /// It takes the values of the class variables and puts them into a map
+  ///
+  /// Returns:
+  ///   A map of the data.
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['profilePicture'] = _profilePicture;

@@ -1,5 +1,7 @@
 import 'package:rive/rive.dart';
 
+/// It's a utility class that creates a StateMachineController from an Artboard and adds it to the
+/// Artboard
 class RivetUtils {
   static StateMachineController getRiveController(Artboard artboard,
       {stateMachine = "State Machine 1"}) {

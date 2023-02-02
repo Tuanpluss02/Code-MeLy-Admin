@@ -1,3 +1,5 @@
+/// It's a class that contains functions that are used to authenticate users, and also to change their
+/// information.
 // ignore_for_file: use_build_context_synchronously
 
 import 'dart:convert';
@@ -138,6 +140,14 @@ class AuthClass {
     return user;
   }
 
+  /// It takes a path to an image file in the assets folder, loads it into memory, converts it to a base64
+  /// string, and returns the base64 string
+  ///
+  /// Args:
+  ///   path (String): The path to the image file in the assets folder.
+  ///
+  /// Returns:
+  ///   A base64 encoded string of the image.
   Future<String> getImageFileFromAssets(String path) async {
     final byteData = await rootBundle.load('assets/$path');
     Uint8List fileByte = byteData.buffer
@@ -146,6 +156,29 @@ class AuthClass {
     return basestring;
   }
 
+  /// It takes in a user object, a password, an image controller, a loading control, a context, and a
+  /// void callback. It then creates a user credential object, and if the user credential object is
+  /// null, it shows a snackbar with an error message. If the user credential object is not null, it
+  /// sets the user id of the user object to the user id of the user credential object, and then it
+  /// uploads the image to firebase storage. If the image controller's image is null, it uploads a
+  /// default image. If the image controller's image is not null, it uploads the image controller's
+  /// image. It then gets the download url of the image, and sets the user's profile picture to the
+  /// download url. It then adds the user to the firestore database, and then it sets the loading
+  /// control's loading to false, and then it calls the void callback
+  ///
+  /// Args:
+  ///   user (UserInformation): UserInformation - A class that contains all the information about the
+  /// user.
+  ///   password (String): String
+  ///   imageController (ImageController): This is a class that I created to handle the image that the
+  /// user uploads.
+  ///   loadingControl (LoadingControl): A class that contains a bool value that is used to show a
+  /// loading indicator.
+  ///   context (BuildContext): BuildContext
+  ///   showBar (VoidCallback): VoidCallback is a function that shows the bottom navigation bar
+  ///
+  /// Returns:
+  ///   A Future<void>
   Future<void> registerUser(
       UserInformation user,
       String password,
@@ -210,10 +243,22 @@ class AuthClass {
     showBar.call();
   }
 
+  Future<void> deleteUserByID(String id) async {
+    await FirebaseFirestore.instance.collection('Users').doc(id).delete();
+  }
+
+  /// It takes a user object, a loading control object, and a context object, and then it updates the user
+  /// information in the database
+  ///
+  /// Args:
+  ///   user (UserInformation): UserInformation
+  ///   loadingControl (LoadingControl): A class that contains a boolean value that is used to show a
+  /// loading indicator.
+  ///   context (BuildContext): BuildContext
   Future<void> updateUserInformation(UserInformation user,
       LoadingControl loadingControl, BuildContext context) async {
-    loadingControl.loading = true;
     try {
+      loadingControl.loading = true;
       await FirebaseFirestore.instance
           .collection('Users')
           .doc(user.userId)
@@ -235,6 +280,29 @@ class AuthClass {
     }
   }
 
+  /// It deletes the user from the Firebase Authentication and Firestore
+  ///
+  /// Args:
+  ///   user (UserInformation): The user object that you want to delete.
+  ///   context (BuildContext): The context of the widget that calls this function.
+  Future<void> deleteUser(UserInformation user, BuildContext context) async {
+    try {
+      await FirebaseAuth.instance.currentUser!.delete();
+      await FirebaseFirestore.instance
+          .collection('Users')
+          .doc(user.userId)
+          .delete();
+      showSnackBar(context, 'User deleted successfully');
+    } catch (e) {
+      showSnackBar(context, 'Failed to delete user');
+    }
+  }
+
+  /// It creates a snackbar with the text passed in, and then shows it in the context passed in
+  ///
+  /// Args:
+  ///   context (BuildContext): The context of the widget that you want to show the snackbar on.
+  ///   text (String): The text to show in the snackbar.
   void showSnackBar(BuildContext context, String text) {
     final snackBar = SnackBar(content: Text(text));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);

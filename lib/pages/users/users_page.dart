@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:mely_admin/pages/users/add_user.dart';
 import 'package:mely_admin/styles/app_styles.dart';
 import 'package:mely_admin/widgets/users/user_card.dart';
-import 'package:mely_admin/widgets/users/user_detail.dart';
+import 'package:mely_admin/pages/users/user_detail.dart';
 
 class UserPage extends StatefulWidget {
   const UserPage({super.key});
@@ -67,7 +67,7 @@ class _UserPageState extends State<UserPage> {
                               closedBuilder: (context, action) =>
                                   userCard(docs, context),
                               openBuilder: (context, action) => UserView(
-                                docs: docs,
+                                userID: docs['userId'],
                               ),
                             ))
                         .toList(),

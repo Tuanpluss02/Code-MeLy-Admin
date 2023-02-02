@@ -5,6 +5,8 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mely_admin/pages/users/add_user.dart';
 
+/// It's a class that has a property called image of type File? and a method called getImage that takes
+/// a BuildContext as a parameter and returns a Future of type void
 class ImageController extends GetxController {
   static ImageController get to => Get.find();
   File? image;

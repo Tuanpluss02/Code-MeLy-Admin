@@ -26,7 +26,6 @@ class _AddUserState extends State<AddUser> {
       profilePicture: '',
       about: 'A member of Code MeLy',
       role: 'Member');
-  // RxBool isLoading = false.obs;
   final _formKey = GlobalKey<FormState>();
   RxString dateOfBirth = ''.obs;
   String password = 'Codemely@123';

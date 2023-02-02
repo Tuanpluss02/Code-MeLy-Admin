@@ -1,11 +1,13 @@
 // ignore_for_file: prefer_final_fields
 
+import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 
 class FancyFab extends StatefulWidget {
   final Function() onPressed1;
   final String tooltip1;
   final Icon icon1;
+  final Widget openWidget1;
   final Function() onPressed2;
   final String tooltip2;
   final Icon icon2;
@@ -14,6 +16,7 @@ class FancyFab extends StatefulWidget {
       {Key? key,
       required this.onPressed1,
       required this.tooltip1,
+      required this.openWidget1,
       required this.icon1,
       required this.onPressed2,
       required this.tooltip2,
@@ -102,11 +105,22 @@ class _FancyFabState extends State<FancyFab>
 
   Widget button1() {
     return FloatingActionButton(
+      shape: const CircleBorder(),
       backgroundColor: Colors.purple,
-      onPressed: widget.onPressed1,
+      onPressed: null,
       tooltip: widget.tooltip1,
       child: widget.icon1,
     );
+  }
+
+  Widget eff() {
+    return OpenContainer(
+        closedShape: const CircleBorder(),
+        tappable: true,
+        transitionDuration: const Duration(milliseconds: 500),
+        // transitionType: ContainerTransitionType.fadeThrough,
+        closedBuilder: (context, action) => button1(),
+        openBuilder: (context, action) => widget.openWidget1);
   }
 
   Widget toggle() {
@@ -149,7 +163,7 @@ class _FancyFabState extends State<FancyFab>
             _translateButton.value,
             0.0,
           ),
-          child: button1(),
+          child: eff(),
         ),
         toggle(),
       ],
