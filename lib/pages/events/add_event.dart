@@ -44,33 +44,52 @@ class AddEvent extends StatelessWidget {
             key: formKey,
             child: Column(
               children: [
-                Container(
-                  height: 200,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: imageController.image != null
-                      ? Image.file(imageController.image!, fit: BoxFit.cover)
-                      : Image.asset(AppStyle.defaultCoverPath,
-                          fit: BoxFit.cover),
-                ),
+                GetBuilder<ImageController>(builder: (_) {
+                  return Container(
+                    height: 200,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: imageController.image != null
+                        ? Image.file(imageController.image!, fit: BoxFit.cover)
+                        : Image.asset(AppStyle.defaultCoverPath,
+                            fit: BoxFit.cover),
+                  );
+                }),
                 const SizedBox(height: 10),
                 Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 10),
                     child: Column(
                       children: [
-                        ElevatedButton(
-                          onPressed: () {
-                            imageController.getImage(context);
-                          },
-                          child: const Text('Pick Image'),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            ElevatedButton(
+                              onPressed: () {
+                                imageController.getImage(context);
+                              },
+                              child: const Text('Pick Image'),
+                            ),
+                            ElevatedButton(
+                              onPressed: () {
+                                imageController.removeImage();
+                              },
+                              child: const Text('Default Image'),
+                            ),
+                          ],
                         ),
                         const SizedBox(height: 10),
                         TextFormField(
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: const BorderSide(
+                                  width: 1, color: Colors.black45),
+                              borderRadius: BorderRadius.circular(50.0),
+                            ),
                             labelText: 'Event Title',
-                            border: OutlineInputBorder(),
+                            border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(50.0)),
                           ),
                           validator: (value) {
                             if (value!.isEmpty) {
@@ -84,9 +103,15 @@ class AddEvent extends StatelessWidget {
                         ),
                         const SizedBox(height: 10),
                         TextFormField(
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: const BorderSide(
+                                  width: 1, color: Colors.black45),
+                              borderRadius: BorderRadius.circular(50.0),
+                            ),
                             labelText: 'Start Time',
-                            border: OutlineInputBorder(),
+                            border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(50.0)),
                           ),
                           validator: (value) {
                             if (value!.isEmpty) {
@@ -100,9 +125,15 @@ class AddEvent extends StatelessWidget {
                         ),
                         const SizedBox(height: 10),
                         TextFormField(
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: const BorderSide(
+                                  width: 1, color: Colors.black45),
+                              borderRadius: BorderRadius.circular(50.0),
+                            ),
                             labelText: 'End Time',
-                            border: OutlineInputBorder(),
+                            border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(50.0)),
                           ),
                           validator: (value) {
                             if (value!.isEmpty) {
@@ -116,9 +147,15 @@ class AddEvent extends StatelessWidget {
                         ),
                         const SizedBox(height: 10),
                         TextFormField(
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: const BorderSide(
+                                  width: 1, color: Colors.black45),
+                              borderRadius: BorderRadius.circular(50.0),
+                            ),
                             labelText: 'Creator',
-                            border: OutlineInputBorder(),
+                            border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(50.0)),
                           ),
                           validator: (value) {
                             if (value!.isEmpty) {
@@ -132,9 +169,17 @@ class AddEvent extends StatelessWidget {
                         ),
                         const SizedBox(height: 10),
                         TextFormField(
-                            decoration: const InputDecoration(
+                            maxLines: 5,
+                            minLines: 3,
+                            decoration: InputDecoration(
+                              enabledBorder: OutlineInputBorder(
+                                borderSide: const BorderSide(
+                                    width: 1, color: Colors.black45),
+                                borderRadius: BorderRadius.circular(50.0),
+                              ),
                               labelText: 'Description',
-                              border: OutlineInputBorder(),
+                              border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(50.0)),
                             ),
                             validator: (value) {
                               if (value!.isEmpty) {

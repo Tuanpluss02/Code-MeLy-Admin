@@ -28,6 +28,11 @@ class ImageController extends GetxController {
     }
   }
 
+  void removeImage() {
+    image = null;
+    update();
+  }
+
   Future<String> getImageFileFromAssets(String path) async {
     final byteData = await rootBundle.load('assets/$path');
     Uint8List fileByte = byteData.buffer
