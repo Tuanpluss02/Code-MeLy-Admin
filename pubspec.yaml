@@ -74,9 +74,8 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-      - assets/rive/icons.riv
-      - assets/images/melycover.png
-      - assets/images/defaultAvatar.jpg
+      - assets/rive/
+      - assets/images/
       
   #   - images/a_dot_ham.jpeg
 

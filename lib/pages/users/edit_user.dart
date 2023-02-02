@@ -7,6 +7,7 @@ import 'package:mely_admin/models/chip_filter.dart';
 import 'package:mely_admin/models/user.dart';
 import 'package:mely_admin/services/auth.dart';
 import 'package:mely_admin/styles/app_styles.dart';
+import 'package:mely_admin/utils/snack_bar.dart';
 
 Map<String, int> teams = {
   'Technical': 0,
@@ -37,7 +38,6 @@ class _AddUserState extends State<EditUser> {
   RxBool isChanged = false.obs;
   final _formKey = GlobalKey<FormState>();
   RxString dateOfBirth = ''.obs;
-  // String password = 'Codemely@123';
 
   @override
   void initState() {
@@ -141,8 +141,7 @@ class _AddUserState extends State<EditUser> {
                                   child: imageController.image != null
                                       ? Image.file(imageController.image!,
                                           fit: BoxFit.cover)
-                                      : Image.asset(
-                                          'assets/images/defaultAvatar.jpg',
+                                      : Image.asset(AppStyle.defaultAvatarPath,
                                           fit: BoxFit.cover),
                                 ),
                               );
@@ -383,9 +382,4 @@ class _AddUserState extends State<EditUser> {
           )),
     );
   }
-}
-
-void showSnackBar(BuildContext context, String text) {
-  final snackBar = SnackBar(content: Text(text));
-  ScaffoldMessenger.of(context).showSnackBar(snackBar);
 }

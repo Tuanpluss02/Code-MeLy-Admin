@@ -2,9 +2,10 @@ import 'package:animations/animations.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:mely_admin/pages/users/add_user.dart';
+import 'package:mely_admin/pages/users/user_detail.dart';
+import 'package:mely_admin/services/firebase_name.dart';
 import 'package:mely_admin/styles/app_styles.dart';
 import 'package:mely_admin/widgets/users/user_card.dart';
-import 'package:mely_admin/pages/users/user_detail.dart';
 
 class UserPage extends StatefulWidget {
   const UserPage({super.key});
@@ -50,8 +51,9 @@ class _UserPageState extends State<UserPage> {
         children: [
           Expanded(
             child: StreamBuilder<QuerySnapshot>(
-              stream:
-                  FirebaseFirestore.instance.collection('Users').snapshots(),
+              stream: FirebaseFirestore.instance
+                  .collection(FirebaseName.usersCollection)
+                  .snapshots(),
               builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());

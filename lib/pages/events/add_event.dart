@@ -1,0 +1,190 @@
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:mely_admin/controllers/image_picker.dart';
+import 'package:mely_admin/controllers/loading_control.dart';
+import 'package:mely_admin/models/event.dart';
+import 'package:mely_admin/services/auth.dart';
+import 'package:mely_admin/styles/app_styles.dart';
+import 'package:mely_admin/utils/snack_bar.dart';
+
+class AddEvent extends StatelessWidget {
+  const AddEvent({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final imageController = Get.find<ImageController>();
+    final loadController = Get.find<LoadingControl>();
+    final formKey = GlobalKey<FormState>();
+    Event event = Event(
+      eventPicture: '',
+      eventId: '',
+      eventTitle: '',
+      startTime: '',
+      endTime: '',
+      creator: '',
+      description: '',
+      isEnded: false,
+    );
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        iconTheme: const IconThemeData(
+          color: Colors.black, //change your color here
+        ),
+        title: Text(
+          'Add Event',
+          style: AppStyle.title.copyWith(fontSize: 25),
+        ),
+        centerTitle: true,
+        backgroundColor: Colors.white,
+        elevation: 0,
+      ),
+      body: SingleChildScrollView(
+        child: Form(
+            key: formKey,
+            child: Column(
+              children: [
+                Container(
+                  height: 200,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: imageController.image != null
+                      ? Image.file(imageController.image!, fit: BoxFit.cover)
+                      : Image.asset(AppStyle.defaultCoverPath,
+                          fit: BoxFit.cover),
+                ),
+                const SizedBox(height: 10),
+                Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: Column(
+                      children: [
+                        ElevatedButton(
+                          onPressed: () {
+                            imageController.getImage(context);
+                          },
+                          child: const Text('Pick Image'),
+                        ),
+                        const SizedBox(height: 10),
+                        TextFormField(
+                          decoration: const InputDecoration(
+                            labelText: 'Event Title',
+                            border: OutlineInputBorder(),
+                          ),
+                          validator: (value) {
+                            if (value!.isEmpty) {
+                              return 'Please enter event title';
+                            }
+                            return null;
+                          },
+                          onSaved: (value) {
+                            event.eventTitle = value!;
+                          },
+                        ),
+                        const SizedBox(height: 10),
+                        TextFormField(
+                          decoration: const InputDecoration(
+                            labelText: 'Start Time',
+                            border: OutlineInputBorder(),
+                          ),
+                          validator: (value) {
+                            if (value!.isEmpty) {
+                              return 'Please enter start time';
+                            }
+                            return null;
+                          },
+                          onSaved: (value) {
+                            event.startTime = value!;
+                          },
+                        ),
+                        const SizedBox(height: 10),
+                        TextFormField(
+                          decoration: const InputDecoration(
+                            labelText: 'End Time',
+                            border: OutlineInputBorder(),
+                          ),
+                          validator: (value) {
+                            if (value!.isEmpty) {
+                              return 'Please enter end time';
+                            }
+                            return null;
+                          },
+                          onSaved: (value) {
+                            event.endTime = value!;
+                          },
+                        ),
+                        const SizedBox(height: 10),
+                        TextFormField(
+                          decoration: const InputDecoration(
+                            labelText: 'Creator',
+                            border: OutlineInputBorder(),
+                          ),
+                          validator: (value) {
+                            if (value!.isEmpty) {
+                              return 'Please enter creator';
+                            }
+                            return null;
+                          },
+                          onSaved: (value) {
+                            event.creator = value!;
+                          },
+                        ),
+                        const SizedBox(height: 10),
+                        TextFormField(
+                            decoration: const InputDecoration(
+                              labelText: 'Description',
+                              border: OutlineInputBorder(),
+                            ),
+                            validator: (value) {
+                              if (value!.isEmpty) {
+                                return 'Please enter description';
+                              }
+                              return null;
+                            }),
+                        const SizedBox(height: 10),
+                        Center(
+                            child: Obx(() => !loadController.loading
+                                ? SizedBox(
+                                    // margin: const EdgeInsets.symmetric(horizontal: 10),
+                                    width: Get.width,
+                                    height: 40,
+                                    child: ElevatedButton(
+                                      onPressed: () {
+                                        if (formKey.currentState!.validate()) {
+                                          formKey.currentState!.save();
+                                          AuthClass().addEvent(
+                                              event,
+                                              imageController,
+                                              loadController,
+                                              context, () {
+                                            showSnackBar(
+                                                context, 'Event Added');
+                                          });
+                                        } else {
+                                          showSnackBar(context,
+                                              'Please fill all fields');
+                                        }
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        // padding: EdgeInsets.symmetric(horizontal: Get.width),
+                                        backgroundColor:
+                                            Colors.deepPurpleAccent,
+                                        shape: const StadiumBorder(),
+                                      ),
+                                      child: const Text(
+                                        "Add New Event",
+                                        style: TextStyle(
+                                            color: Colors.white, fontSize: 18),
+                                      ),
+                                    ),
+                                  )
+                                : const CircularProgressIndicator())),
+                      ],
+                    )),
+              ],
+            )),
+      ),
+    );
+  }
+}

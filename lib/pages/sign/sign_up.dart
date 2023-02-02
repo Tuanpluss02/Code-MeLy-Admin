@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mely_admin/models/user.dart';
 import 'package:mely_admin/services/auth.dart';
+import 'package:mely_admin/services/firebase_name.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SignUp extends StatefulWidget {
@@ -62,7 +63,7 @@ class _SignUpState extends State<SignUp> {
 
     Reference ref = FirebaseStorage.instance
         .ref()
-        .child('user_image')
+        .child(FirebaseName.userImage)
         .child('${userCredential.user!.uid}.jpg');
 
     UploadTask uploadTask = ref.putFile(_image!);
@@ -70,7 +71,7 @@ class _SignUpState extends State<SignUp> {
     _user.profilePicture = await snapshot.ref.getDownloadURL();
 
     await FirebaseFirestore.instance
-        .collection('Users')
+        .collection(FirebaseName.usersCollection)
         .doc(userCredential.user!.uid)
         .collection('UserInformation')
         .doc(userCredential.user!.uid)

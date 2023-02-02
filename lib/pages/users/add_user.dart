@@ -6,6 +6,7 @@ import 'package:mely_admin/models/chip_filter.dart';
 import 'package:mely_admin/models/user.dart';
 import 'package:mely_admin/services/auth.dart';
 import 'package:mely_admin/styles/app_styles.dart';
+import 'package:mely_admin/utils/snack_bar.dart';
 
 class AddUser extends StatefulWidget {
   const AddUser({super.key});
@@ -46,7 +47,7 @@ class _AddUserState extends State<AddUser> {
             color: Colors.black, //change your color here
           ),
           title: Text(
-            'Add user',
+            'Add User',
             style: AppStyle.title.copyWith(fontSize: 25),
           ),
           centerTitle: true,
@@ -73,8 +74,7 @@ class _AddUserState extends State<AddUser> {
                                 child: imageController.image != null
                                     ? Image.file(imageController.image!,
                                         fit: BoxFit.cover)
-                                    : Image.asset(
-                                        'assets/images/defaultAvatar.jpg',
+                                    : Image.asset(AppStyle.defaultAvatarPath,
                                         fit: BoxFit.cover),
                               ),
                             );
@@ -333,10 +333,6 @@ class _AddUserState extends State<AddUser> {
   }
 }
 
-void showSnackBar(BuildContext context, String text) {
-  final snackBar = SnackBar(content: Text(text));
-  ScaffoldMessenger.of(context).showSnackBar(snackBar);
-}
 
 // Future<String> datePicker(bool hasTime) async {
   //   final DateTime? picked = await showDatePicker(

@@ -1,19 +1,19 @@
-/// It's a class that contains functions that are used to authenticate users, and also to change their
-/// information.
 // ignore_for_file: use_build_context_synchronously
 
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mely_admin/controllers/image_picker.dart';
 import 'package:mely_admin/controllers/loading_control.dart';
+import 'package:mely_admin/models/event.dart';
 import 'package:mely_admin/models/user.dart';
+import 'package:mely_admin/services/firebase_name.dart';
+import 'package:mely_admin/styles/app_styles.dart';
+import 'package:mely_admin/utils/snack_bar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthClass {
@@ -61,7 +61,7 @@ class AuthClass {
     try {
       await currentUser.updateEmail(email);
       await FirebaseFirestore.instance
-          .collection('Users')
+          .collection(FirebaseName.usersCollection)
           .doc(currentUser.uid)
           .collection('UserInformation')
           .doc(currentUser.uid)
@@ -82,7 +82,7 @@ class AuthClass {
     final currentUser = FirebaseAuth.instance.currentUser!;
     try {
       await FirebaseFirestore.instance
-          .collection('Users')
+          .collection(FirebaseName.usersCollection)
           .doc(currentUser.uid)
           .collection('UserInformation')
           .doc(currentUser.uid)
@@ -120,14 +120,15 @@ class AuthClass {
     try {
       final image =
           await picker.pickImage(source: ImageSource.gallery, imageQuality: 50);
-      Reference ref = FirebaseStorage.instance.ref().child('user_image');
+      Reference ref =
+          FirebaseStorage.instance.ref().child(FirebaseName.userImage);
       ref.child('${user.userId}.jpg').delete();
       ref = ref.child('${user.userId}.jpg');
       UploadTask uploadTask = ref.putFile(File(image!.path));
       final snapshot = await uploadTask.whenComplete(() => null);
       user.profilePicture = await snapshot.ref.getDownloadURL();
       await FirebaseFirestore.instance
-          .collection('Users')
+          .collection(FirebaseName.usersCollection)
           .doc(user.userId)
           .set({
         'profilePicture': user.profilePicture,
@@ -138,22 +139,6 @@ class AuthClass {
       showSnackBar(context, e.toString());
     }
     return user;
-  }
-
-  /// It takes a path to an image file in the assets folder, loads it into memory, converts it to a base64
-  /// string, and returns the base64 string
-  ///
-  /// Args:
-  ///   path (String): The path to the image file in the assets folder.
-  ///
-  /// Returns:
-  ///   A base64 encoded string of the image.
-  Future<String> getImageFileFromAssets(String path) async {
-    final byteData = await rootBundle.load('assets/$path');
-    Uint8List fileByte = byteData.buffer
-        .asUint8List(byteData.offsetInBytes, byteData.lengthInBytes);
-    String basestring = base64.encode(fileByte);
-    return basestring;
   }
 
   /// It takes in a user object, a password, an image controller, a loading control, a context, and a
@@ -208,25 +193,11 @@ class AuthClass {
     }
 
     user.userId = userCredential.user!.uid;
-
-    Reference ref = FirebaseStorage.instance
-        .ref()
-        .child('user_image')
-        .child('${userCredential.user!.uid}.jpg');
-
-    UploadTask uploadTask;
-    if (imageController.image != null) {
-      uploadTask = ref.putFile(imageController.image!);
-    } else {
-      uploadTask = ref.putString(
-          await getImageFileFromAssets('images/defaultAvatar.jpg'),
-          format: PutStringFormat.base64);
-    }
-    final snapshot = await uploadTask.whenComplete(() => null);
-    user.profilePicture = await snapshot.ref.getDownloadURL();
+    user.profilePicture = await imageController.getURL(userCredential.user!.uid,
+        AppStyle.defaultAvatarPath, FirebaseName.eventImage);
 
     await FirebaseFirestore.instance
-        .collection('Users')
+        .collection(FirebaseName.usersCollection)
         .doc(userCredential.user!.uid)
         .set({
       'userId': user.userId,
@@ -243,8 +214,22 @@ class AuthClass {
     showBar.call();
   }
 
+  /// This function deletes a user from the database by their ID
+  ///
+  /// Args:
+  ///   id (String): The id of the user you want to delete.
   Future<void> deleteUserByID(String id) async {
-    await FirebaseFirestore.instance.collection('Users').doc(id).delete();
+    await FirebaseFirestore.instance
+        .collection(FirebaseName.usersCollection)
+        .doc(id)
+        .delete();
+  }
+
+  Future<void> deleteEventByID(String id) async {
+    await FirebaseFirestore.instance
+        .collection(FirebaseName.eventsCollection)
+        .doc(id)
+        .delete();
   }
 
   /// It takes a user object, a loading control object, and a context object, and then it updates the user
@@ -260,7 +245,7 @@ class AuthClass {
     try {
       loadingControl.loading = true;
       await FirebaseFirestore.instance
-          .collection('Users')
+          .collection(FirebaseName.usersCollection)
           .doc(user.userId)
           .set({
         'userId': user.userId,
@@ -289,7 +274,7 @@ class AuthClass {
     try {
       await FirebaseAuth.instance.currentUser!.delete();
       await FirebaseFirestore.instance
-          .collection('Users')
+          .collection(FirebaseName.usersCollection)
           .doc(user.userId)
           .delete();
       showSnackBar(context, 'User deleted successfully');
@@ -298,13 +283,42 @@ class AuthClass {
     }
   }
 
+  Future<void> addEvent(
+      Event event,
+      ImageController imageController,
+      LoadingControl loadingControl,
+      BuildContext context,
+      VoidCallback showBar) async {
+    try {
+      loadingControl.loading = true;
+      FirebaseName.eventImage = await imageController.getURL(
+          event.eventId!, AppStyle.defaultCoverPath, FirebaseName.eventImage);
+      DocumentReference ref =
+          FirebaseFirestore.instance.collection("my_collection").doc();
+      event.eventId = ref.id;
+      await FirebaseFirestore.instance
+          .collection(FirebaseName.eventsCollection)
+          .add({
+        'eventId': event.eventId,
+        'eventTitle': event.eventTitle,
+        'description': event.description,
+        'endTime': event.endTime,
+        'startTime': event.startTime,
+        'eventPicture': event.eventPicture,
+        'creator': event.creator,
+        'isEnded': event.isEnded,
+      });
+      loadingControl.loading = false;
+      showBar.call();
+    } catch (e) {
+      showSnackBar(context, 'Failed to add event');
+      return;
+    }
+  }
+
   /// It creates a snackbar with the text passed in, and then shows it in the context passed in
   ///
   /// Args:
   ///   context (BuildContext): The context of the widget that you want to show the snackbar on.
   ///   text (String): The text to show in the snackbar.
-  void showSnackBar(BuildContext context, String text) {
-    final snackBar = SnackBar(content: Text(text));
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-  }
 }

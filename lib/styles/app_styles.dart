@@ -39,4 +39,7 @@ class AppStyle {
     fontSize: 16,
     color: mainColor,
   );
+
+  static String defaultCoverPath = 'assets/images/melycover.png';
+  static String defaultAvatarPath = AppStyle.defaultAvatarPath;
 }

@@ -4,7 +4,9 @@ import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 import 'package:mely_admin/pages/users/edit_user.dart';
 import 'package:mely_admin/services/auth.dart';
+import 'package:mely_admin/services/firebase_name.dart';
 import 'package:mely_admin/styles/app_styles.dart';
+import 'package:mely_admin/utils/snack_bar.dart';
 import 'package:mely_admin/widgets/fab_custom.dart';
 
 class UserView extends StatefulWidget {
@@ -83,7 +85,7 @@ class _UserViewState extends State<UserView> {
         // backgroundColor: Colors.black,
         body: StreamBuilder<DocumentSnapshot>(
             stream: FirebaseFirestore.instance
-                .collection('Users')
+                .collection(FirebaseName.usersCollection)
                 .doc(widget.userID)
                 .snapshots(),
             builder: (context, docs) {
@@ -99,7 +101,7 @@ class _UserViewState extends State<UserView> {
                           bottomLeft: Radius.circular(20),
                           bottomRight: Radius.circular(20)),
                       child: Image.asset(
-                        'assets/images/melycover.png',
+                        AppStyle.defaultCoverPath,
                       ),
                     ),
                     Padding(
@@ -158,22 +160,6 @@ class _UserViewState extends State<UserView> {
                                   ])),
                             ],
                           ),
-                          // Container(
-                          //   // margin: const EdgeInsets.only(top: 100),
-                          //   padding: EdgeInsets.only(top: size.height * 0.25),
-                          //   // padding: const EdgeInsets.only(
-                          //   //     top: 100), // Border width
-                          //   child: Column(
-                          //     crossAxisAlignment: CrossAxisAlignment.start,
-                          //     children: [
-                          //       Text(
-                          //         docs.data!['displayName'],
-                          //         style: AppStyle.displayName,
-                          //       ),
-
-                          //     ],
-                          //   ),
-                          // ),
                           const SizedBox(height: 10),
                           const Divider(
                             color: Colors.black45,
@@ -224,12 +210,12 @@ class _UserViewState extends State<UserView> {
               opacity: _isFabVisible.value ? 1 : 0,
               child: StreamBuilder<DocumentSnapshot>(
                   stream: FirebaseFirestore.instance
-                      .collection('Users')
+                      .collection(FirebaseName.usersCollection)
                       .doc(widget.userID)
                       .snapshots(),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(child: CircularProgressIndicator());
+                      return const SizedBox();
                     }
                     if (snapshot.hasData) {
                       return FancyFab(
@@ -248,15 +234,10 @@ class _UserViewState extends State<UserView> {
                         onPressed1: () {},
                       );
                     }
-                    return const Center(child: CircularProgressIndicator());
+                    return const SizedBox();
                   })),
         ),
       ),
     );
   }
-}
-
-void showSnackBar(BuildContext context, String text) {
-  final snackBar = SnackBar(content: Text(text));
-  ScaffoldMessenger.of(context).showSnackBar(snackBar);
 }

@@ -1,9 +1,12 @@
 import 'package:animations/animations.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:mely_admin/pages/events/add_event.dart';
+import 'package:mely_admin/pages/events/event_detail.dart';
+import 'package:mely_admin/services/firebase_name.dart';
 import 'package:mely_admin/styles/app_styles.dart';
 import 'package:mely_admin/widgets/events/event_card.dart';
-import 'package:mely_admin/pages/events/event_detail.dart';
 
 class EventPage extends StatefulWidget {
   const EventPage({super.key});
@@ -20,7 +23,7 @@ class _EventPageState extends State<EventPage> {
   // }
 
   // Future<void> _createUser() async {
-  //   await FirebaseFirestore.instance.collection('Events').add(
+  //   await FirebaseFirestore.instance.collection(FirebaseName.eventsCollection).add(
   //     {
   //       'eventName': 'Ong Dev Show',
   //       'eventPicture':
@@ -39,7 +42,7 @@ class _EventPageState extends State<EventPage> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         title: Text(
-          'Events',
+          FirebaseName.eventsCollection,
           style: AppStyle.title.copyWith(fontSize: 25),
         ),
         centerTitle: true,
@@ -47,7 +50,10 @@ class _EventPageState extends State<EventPage> {
         elevation: 0,
         actions: [
           IconButton(
-            onPressed: () {},
+            onPressed: () => Get.to(
+              const AddEvent(),
+              transition: Transition.upToDown,
+            ),
             icon: const Icon(
               Icons.add,
               color: Colors.black,
@@ -61,8 +67,9 @@ class _EventPageState extends State<EventPage> {
         children: [
           Flexible(
             child: StreamBuilder<QuerySnapshot>(
-              stream:
-                  FirebaseFirestore.instance.collection('Events').snapshots(),
+              stream: FirebaseFirestore.instance
+                  .collection(FirebaseName.eventsCollection)
+                  .snapshots(),
               builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
