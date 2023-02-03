@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mely_admin/root.dart';
 
+import 'controllers/date_picker_controller.dart';
 import 'controllers/image_picker.dart';
 import 'controllers/loading_control.dart';
 
@@ -11,6 +12,7 @@ Future<void> main() async {
   await Firebase.initializeApp();
   Get.put(ImageController());
   Get.put(LoadingControl());
+  Get.put(DatePickerController());
   runApp(const MyApp());
 }
 

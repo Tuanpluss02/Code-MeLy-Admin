@@ -41,5 +41,5 @@ class AppStyle {
   );
 
   static String defaultCoverPath = 'assets/images/melycover.png';
-  static String defaultAvatarPath = AppStyle.defaultAvatarPath;
+  static String defaultAvatarPath = 'assets/images/defaultAvatar.jpg';
 }

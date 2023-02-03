@@ -51,7 +51,7 @@ class _EventPageState extends State<EventPage> {
         actions: [
           IconButton(
             onPressed: () => Get.to(
-              const AddEvent(),
+              () => const AddEvent(),
               transition: Transition.upToDown,
             ),
             icon: const Icon(

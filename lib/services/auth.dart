@@ -291,14 +291,16 @@ class AuthClass {
       VoidCallback showBar) async {
     try {
       loadingControl.loading = true;
-      FirebaseName.eventImage = await imageController.getURL(
-          event.eventId!, AppStyle.defaultCoverPath, FirebaseName.eventImage);
-      DocumentReference ref =
-          FirebaseFirestore.instance.collection("my_collection").doc();
+      DocumentReference ref = FirebaseFirestore.instance
+          .collection(FirebaseName.eventsCollection)
+          .doc();
       event.eventId = ref.id;
+      event.eventPicture = await imageController.getURL(
+          event.eventId!, AppStyle.defaultCoverPath, FirebaseName.eventImage);
       await FirebaseFirestore.instance
           .collection(FirebaseName.eventsCollection)
-          .add({
+          .doc(event.eventId)
+          .set({
         'eventId': event.eventId,
         'eventTitle': event.eventTitle,
         'description': event.description,
@@ -312,13 +314,6 @@ class AuthClass {
       showBar.call();
     } catch (e) {
       showSnackBar(context, 'Failed to add event');
-      return;
     }
   }
-
-  /// It creates a snackbar with the text passed in, and then shows it in the context passed in
-  ///
-  /// Args:
-  ///   context (BuildContext): The context of the widget that you want to show the snackbar on.
-  ///   text (String): The text to show in the snackbar.
 }

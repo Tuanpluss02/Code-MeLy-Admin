@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:mely_admin/controllers/date_picker_controller.dart';
 import 'package:mely_admin/controllers/image_picker.dart';
 import 'package:mely_admin/controllers/loading_control.dart';
 import 'package:mely_admin/models/event.dart';
@@ -14,6 +15,8 @@ class AddEvent extends StatelessWidget {
   Widget build(BuildContext context) {
     final imageController = Get.find<ImageController>();
     final loadController = Get.find<LoadingControl>();
+    final startTimePicker = Get.find<DatePickerController>();
+    final endTimePicker = Get.find<DatePickerController>();
     final formKey = GlobalKey<FormState>();
     Event event = Event(
       eventPicture: '',
@@ -102,49 +105,46 @@ class AddEvent extends StatelessWidget {
                           },
                         ),
                         const SizedBox(height: 10),
-                        TextFormField(
-                          decoration: InputDecoration(
-                            enabledBorder: OutlineInputBorder(
-                              borderSide: const BorderSide(
-                                  width: 1, color: Colors.black45),
-                              borderRadius: BorderRadius.circular(50.0),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            TextButton.icon(
+                              onPressed: () {
+                                startTimePicker.pickDate(context);
+                                event.startTime = startTimePicker.selected;
+                              },
+                              icon: const Icon(Icons.calendar_today),
+                              label: const Text('Start Time'),
                             ),
-                            labelText: 'Start Time',
-                            border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(50.0)),
-                          ),
-                          validator: (value) {
-                            if (value!.isEmpty) {
-                              return 'Please enter start time';
-                            }
-                            return null;
-                          },
-                          onSaved: (value) {
-                            event.startTime = value!;
-                          },
-                        ),
-                        const SizedBox(height: 10),
-                        TextFormField(
-                          decoration: InputDecoration(
-                            enabledBorder: OutlineInputBorder(
-                              borderSide: const BorderSide(
-                                  width: 1, color: Colors.black45),
-                              borderRadius: BorderRadius.circular(50.0),
+                            SizedBox(width: Get.width * 0.1),
+                            TextButton.icon(
+                              onPressed: () {
+                                endTimePicker.pickDate(context);
+                                event.endTime = endTimePicker.selected;
+                              },
+                              icon: const Icon(Icons.calendar_today),
+                              label: const Text('End Time'),
                             ),
-                            labelText: 'End Time',
-                            border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(50.0)),
-                          ),
-                          validator: (value) {
-                            if (value!.isEmpty) {
-                              return 'Please enter end time';
-                            }
-                            return null;
-                          },
-                          onSaved: (value) {
-                            event.endTime = value!;
-                          },
+                          ],
                         ),
+                        const SizedBox(height: 5),
+                        Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Obx(() {
+                                return Text(
+                                  startTimePicker.selected,
+                                  style: AppStyle.title.copyWith(fontSize: 15),
+                                );
+                              }),
+                              // SizedBox(width: Get.width * 0.1),
+                              // Obx(() {
+                              //   return Text(
+                              //     endTimePicker.selected,
+                              //     style: AppStyle.title.copyWith(fontSize: 15),
+                              //   );
+                              // }),
+                            ]),
                         const SizedBox(height: 10),
                         TextFormField(
                           decoration: InputDecoration(
@@ -186,6 +186,9 @@ class AddEvent extends StatelessWidget {
                                 return 'Please enter description';
                               }
                               return null;
+                            },
+                            onSaved: (value) {
+                              event.description = value!;
                             }),
                         const SizedBox(height: 10),
                         Center(

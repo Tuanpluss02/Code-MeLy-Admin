@@ -33,14 +33,31 @@ class ImageController extends GetxController {
     update();
   }
 
+  /// It takes a path to an image file in the assets folder, loads it into memory, converts it to a base64
+  /// string, and returns the base64 string
+  ///
+  /// Args:
+  ///   path (String): The path to the image file in the assets folder.
+  ///
+  /// Returns:
+  ///   A base64 encoded string of the image.
   Future<String> getImageFileFromAssets(String path) async {
-    final byteData = await rootBundle.load('assets/$path');
+    final byteData = await rootBundle.load(path);
     Uint8List fileByte = byteData.buffer
         .asUint8List(byteData.offsetInBytes, byteData.lengthInBytes);
     String basestring = base64.encode(fileByte);
     return basestring;
   }
 
+  /// It takes an image, uploads it to firebase storage, and returns the download url
+  ///
+  /// Args:
+  ///   id (String): The id of the user.
+  ///   defaultImagePath (String): This is the path to the default image in the assets folder.
+  ///   destination (String): The folder in the Firebase Storage where the image will be stored.
+  ///
+  /// Returns:
+  ///   A Future<String>
   Future<String> getURL(
       String id, String defaultImagePath, String destination) async {
     Reference ref =

@@ -49,6 +49,7 @@ dependencies:
   material_floating_search_bar: ^0.3.7
   shared_preferences: ^2.0.16
   path_provider: ^2.0.12
+  flutter_datetime_picker: ^1.5.1
 
 dev_dependencies:
   flutter_test:
