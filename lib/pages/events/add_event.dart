@@ -13,17 +13,18 @@ class AddEvent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    RxString showDate =
+        '${DateTime.now().hour}:${DateTime.now().minute} ${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}'
+            .obs;
     final imageController = Get.find<ImageController>();
     final loadController = Get.find<LoadingControl>();
     final startTimePicker = Get.find<DatePickerController>();
-    final endTimePicker = Get.find<DatePickerController>();
     final formKey = GlobalKey<FormState>();
     Event event = Event(
       eventPicture: '',
       eventId: '',
       eventTitle: '',
       startTime: '',
-      endTime: '',
       creator: '',
       description: '',
       isEnded: false,
@@ -111,40 +112,22 @@ class AddEvent extends StatelessWidget {
                             TextButton.icon(
                               onPressed: () {
                                 startTimePicker.pickDate(context);
-                                event.startTime = startTimePicker.selected;
+                                event.startTime =
+                                    '${startTimePicker.time} ${startTimePicker.date}';
+                                showDate.value = event.startTime!;
                               },
                               icon: const Icon(Icons.calendar_today),
                               label: const Text('Start Time'),
                             ),
-                            SizedBox(width: Get.width * 0.1),
-                            TextButton.icon(
-                              onPressed: () {
-                                endTimePicker.pickDate(context);
-                                event.endTime = endTimePicker.selected;
-                              },
-                              icon: const Icon(Icons.calendar_today),
-                              label: const Text('End Time'),
-                            ),
+                            const SizedBox(width: 10),
+                            Obx(() {
+                              return Text(
+                                showDate.value,
+                                style: AppStyle.title.copyWith(fontSize: 15),
+                              );
+                            }),
                           ],
                         ),
-                        const SizedBox(height: 5),
-                        Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              Obx(() {
-                                return Text(
-                                  startTimePicker.selected,
-                                  style: AppStyle.title.copyWith(fontSize: 15),
-                                );
-                              }),
-                              // SizedBox(width: Get.width * 0.1),
-                              // Obx(() {
-                              //   return Text(
-                              //     endTimePicker.selected,
-                              //     style: AppStyle.title.copyWith(fontSize: 15),
-                              //   );
-                              // }),
-                            ]),
                         const SizedBox(height: 10),
                         TextFormField(
                           decoration: InputDecoration(

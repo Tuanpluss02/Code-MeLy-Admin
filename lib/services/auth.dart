@@ -304,7 +304,6 @@ class AuthClass {
         'eventId': event.eventId,
         'eventTitle': event.eventTitle,
         'description': event.description,
-        'endTime': event.endTime,
         'startTime': event.startTime,
         'eventPicture': event.eventPicture,
         'creator': event.creator,

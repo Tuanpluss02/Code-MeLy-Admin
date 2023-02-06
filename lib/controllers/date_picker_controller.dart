@@ -4,47 +4,34 @@ import 'package:get/get.dart';
 
 class DatePickerController extends GetxController {
   static DatePickerController get to => Get.find();
-  String selected = DateTime.now()
-      .toLocal()
-      .toString()
-      .split(' ')[0]
-      .split('-')
-      .reversed
-      .join('/');
+  String date =
+      '${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}';
+  String time = '${DateTime.now().hour}:${DateTime.now().minute}';
 
   /// This function is used to pick a date from a calendar and then convert it to a string
   ///
   /// Args:
   ///   context (BuildContext): The context of the widget that calls the function.
   void pickDate(BuildContext context) {
+    // String time = '';
+    // String date = '';
     DateTime now = DateTime.now();
+    DatePicker.showTimePicker(context,
+        theme: const DatePickerTheme(containerHeight: 210.0),
+        showTitleActions: true,
+        showSecondsColumn: false, onChanged: (val) {
+      time = '${val.hour}:${val.minute}';
+    }, onConfirm: (val) {
+      time = '${val.hour}:${val.minute}';
+    }, currentTime: DateTime.now(), locale: LocaleType.en);
     DatePicker.showDatePicker(context,
         showTitleActions: true,
         minTime: DateTime(now.year, now.month, now.day),
-        maxTime: DateTime(2050, 12, 31), onChanged: (date) {
-      selected = dateToString(date);
-    }, onConfirm: (date) {
-      selected = dateToString(date);
+        maxTime: DateTime(2050, 12, 31), onChanged: (val) {
+      date = '${val.day}/${val.month}/${val.year} ';
+    }, onConfirm: (val) {
+      date = '${val.day}/${val.month}/${val.year} ';
     }, currentTime: DateTime.now(), locale: LocaleType.en);
     update();
-  }
-
-  /// It takes a date, converts it to a string, splits the string into an array of strings, takes the
-  /// first element of the array, splits that string into an array of strings, reverses the array, and
-  /// joins the array into a string
-  ///
-  /// Args:
-  ///   date (DateTime): The date to be formatted.
-  ///
-  /// Returns:
-  ///   A string.
-  String dateToString(DateTime date) {
-    return date
-        .toLocal()
-        .toString()
-        .split(' ')[0]
-        .split('-')
-        .reversed
-        .join('/');
   }
 }

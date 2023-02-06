@@ -19,7 +19,23 @@ class EventDetail extends StatefulWidget {
 
 class _EventDetailState extends State<EventDetail> {
   late ScrollController _fabcontroller;
-  late RxBool _isFabVisible;
+  late RxBool _fabVisible;
+
+  @override
+  void initState() {
+    super.initState();
+    _fabcontroller = ScrollController();
+    _fabVisible = true.obs;
+    _fabcontroller.addListener(() {
+      if (_fabcontroller.position.userScrollDirection ==
+          ScrollDirection.forward) {
+        if (_fabVisible.value == false) _fabVisible.value = true;
+      } else if (_fabcontroller.position.userScrollDirection ==
+          ScrollDirection.reverse) {
+        if (_fabVisible.value == true) _fabVisible.value = false;
+      }
+    });
+  }
 
   Future<void> deleteEvent(VoidCallback naviPop) async {
     showDialog(
@@ -46,22 +62,6 @@ class _EventDetailState extends State<EventDetail> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    _fabcontroller = ScrollController();
-    _isFabVisible = true.obs;
-    _fabcontroller.addListener(() {
-      if (_fabcontroller.position.userScrollDirection ==
-          ScrollDirection.forward) {
-        if (_isFabVisible.value == false) _isFabVisible.value = true;
-      } else if (_fabcontroller.position.userScrollDirection ==
-          ScrollDirection.reverse) {
-        if (_isFabVisible.value == true) _isFabVisible.value = false;
-      }
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return SafeArea(
@@ -77,6 +77,7 @@ class _EventDetailState extends State<EventDetail> {
               }
               if (snapshot.hasData) {
                 return SingleChildScrollView(
+                  controller: _fabcontroller,
                   child: Stack(children: [
                     Container(
                       height: size.height * 0.35,
@@ -130,16 +131,16 @@ class _EventDetailState extends State<EventDetail> {
                                         style: AppStyle.content,
                                       )
                                     ])),
-                                SizedBox(width: size.width * 0.2),
-                                Text.rich(TextSpan(
-                                    text: 'End at: ',
-                                    style: AppStyle.title,
-                                    children: <InlineSpan>[
-                                      TextSpan(
-                                        text: snapshot.data!['endTime'],
-                                        style: AppStyle.content,
-                                      )
-                                    ])),
+                                // SizedBox(width: size.width * 0.2),
+                                // Text.rich(TextSpan(
+                                //     text: 'End at: ',
+                                //     style: AppStyle.title,
+                                //     children: <InlineSpan>[
+                                //       TextSpan(
+                                //         text: snapshot.data!['endTime'],
+                                //         style: AppStyle.content,
+                                //       )
+                                //     ])),
                               ],
                             ),
                             const SizedBox(height: 10),
@@ -178,7 +179,7 @@ class _EventDetailState extends State<EventDetail> {
         floatingActionButton: Obx(
           () => AnimatedOpacity(
               duration: const Duration(milliseconds: 200),
-              opacity: _isFabVisible.value ? 1 : 0,
+              opacity: _fabVisible.value ? 1 : 0,
               child: StreamBuilder<DocumentSnapshot>(
                   stream: FirebaseFirestore.instance
                       .collection('Events')

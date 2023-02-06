@@ -46,16 +46,6 @@ Widget eventCard(QueryDocumentSnapshot docs, BuildContext context) {
                         style: AppStyle.content,
                       )
                     ])),
-                const SizedBox(height: 10),
-                Text.rich(TextSpan(
-                    text: 'End at: ',
-                    style: AppStyle.title,
-                    children: <InlineSpan>[
-                      TextSpan(
-                        text: docs['endTime'],
-                        style: AppStyle.content,
-                      )
-                    ])),
               ],
             ),
           ),
