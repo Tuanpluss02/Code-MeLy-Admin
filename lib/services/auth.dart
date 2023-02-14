@@ -225,6 +225,10 @@ class AuthClass {
         .delete();
   }
 
+  /// It deletes the event with the given id.
+  ///
+  /// Args:
+  ///   id (String): The id of the event you want to delete.
   Future<void> deleteEventByID(String id) async {
     await FirebaseFirestore.instance
         .collection(FirebaseName.eventsCollection)

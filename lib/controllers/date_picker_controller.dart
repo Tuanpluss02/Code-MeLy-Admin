@@ -21,17 +21,20 @@ class DatePickerController extends GetxController {
         showTitleActions: true,
         showSecondsColumn: false, onChanged: (val) {
       time = '${val.hour}:${val.minute}';
+      update();
     }, onConfirm: (val) {
       time = '${val.hour}:${val.minute}';
+      update();
     }, currentTime: DateTime.now(), locale: LocaleType.en);
     DatePicker.showDatePicker(context,
         showTitleActions: true,
         minTime: DateTime(now.year, now.month, now.day),
         maxTime: DateTime(2050, 12, 31), onChanged: (val) {
       date = '${val.day}/${val.month}/${val.year} ';
+      update();
     }, onConfirm: (val) {
       date = '${val.day}/${val.month}/${val.year} ';
+      update();
     }, currentTime: DateTime.now(), locale: LocaleType.en);
-    update();
   }
 }

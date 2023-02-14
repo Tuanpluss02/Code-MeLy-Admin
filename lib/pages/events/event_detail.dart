@@ -66,6 +66,7 @@ class _EventDetailState extends State<EventDetail> {
     Size size = MediaQuery.of(context).size;
     return SafeArea(
       child: Scaffold(
+        backgroundColor: AppStyle.eventDetailColor,
         body: StreamBuilder<DocumentSnapshot>(
             stream: FirebaseFirestore.instance
                 .collection('Events')
@@ -101,6 +102,7 @@ class _EventDetailState extends State<EventDetail> {
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 10),
                         child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             SizedBox(
                               width: size.width * 0.8,
@@ -120,40 +122,30 @@ class _EventDetailState extends State<EventDetail> {
                             const SizedBox(height: 10),
                             const Divider(),
                             const SizedBox(height: 10),
-                            Row(
-                              children: [
-                                Text.rich(TextSpan(
-                                    text: 'Start at: ',
-                                    style: AppStyle.title,
-                                    children: <InlineSpan>[
-                                      TextSpan(
-                                        text: snapshot.data!['startTime'],
-                                        style: AppStyle.content,
-                                      )
-                                    ])),
-                                // SizedBox(width: size.width * 0.2),
-                                // Text.rich(TextSpan(
-                                //     text: 'End at: ',
-                                //     style: AppStyle.title,
-                                //     children: <InlineSpan>[
-                                //       TextSpan(
-                                //         text: snapshot.data!['endTime'],
-                                //         style: AppStyle.content,
-                                //       )
-                                //     ])),
-                              ],
-                            ),
-                            const SizedBox(height: 10),
-                            Text.rich(
-                              TextSpan(
-                                  text: 'Creator: ',
+                            Center(
+                              child: Text.rich(TextSpan(
+                                  text: 'Start at: ',
                                   style: AppStyle.title,
                                   children: <InlineSpan>[
                                     TextSpan(
-                                      text: snapshot.data!['creator'],
+                                      text: snapshot.data!['startTime'],
                                       style: AppStyle.content,
                                     )
-                                  ]),
+                                  ])),
+                            ),
+                            const SizedBox(height: 10),
+                            Center(
+                              child: Text.rich(
+                                TextSpan(
+                                    text: 'Creator: ',
+                                    style: AppStyle.title,
+                                    children: <InlineSpan>[
+                                      TextSpan(
+                                        text: snapshot.data!['creator'],
+                                        style: AppStyle.content,
+                                      )
+                                    ]),
+                              ),
                             ),
                             const SizedBox(height: 10),
                             Text.rich(

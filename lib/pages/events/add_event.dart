@@ -130,6 +130,7 @@ class AddEvent extends StatelessWidget {
                         ),
                         const SizedBox(height: 10),
                         TextFormField(
+                          // initialValue: event.creator,
                           decoration: InputDecoration(
                             enabledBorder: OutlineInputBorder(
                               borderSide: const BorderSide(
